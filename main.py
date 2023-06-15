@@ -42,3 +42,20 @@ class AnsiEscapeCodeRemover:
     def flush(self):
         self.file.flush()
 
+
+if __name__ == '__main__':
+    PROJECT_DIR = os.path.join(*os.getcwd().split('/')[:-1])
+    IS_DEMO = True
+    IS_PRINT_TO_FILE = False
+    RUNNING_STRATEGIES = []
+
+    # check system arguments
+    argus = sys.argv[1:]
+    for argu in argus:
+        argu = argu.lower()
+        if 'demo=' in argu and argu.lstrip('demo=') == 'false':
+            IS_DEMO = False
+        if 'print_to_file=' in argu and argu.lower().lstrip('print_to_file=') == 'true':
+            IS_PRINT_TO_FILE = True
+        if 'strategy=' in argu:
+            RUNNING_STRATEGIES = argu.lstrip('strategy=').upper().split(',')
