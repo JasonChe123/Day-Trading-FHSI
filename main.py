@@ -44,7 +44,7 @@ class AnsiEscapeCodeRemover:
 
 
 if __name__ == '__main__':
-    PROJECT_DIR = os.path.join(*os.getcwd().split('/')[:-1])
+    PROJECT_DIR = os.getcwd()
     IS_DEMO = True
     IS_PRINT_TO_FILE = False
     RUNNING_STRATEGIES = []
