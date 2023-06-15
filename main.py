@@ -1,16 +1,24 @@
-# This is a sample Python script.
+# SYSTEM MODULES ----------------------------------------------------------------------------------
+import logging
+import os
+from pathlib import Path
+import re
+import sys
+import threading as th
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+# PROJECT MODULES ---------------------------------------------------------------------------------
+"""from library.futu_api import FutuApi
+from library.ibapi import IBApi
+from library.printing import LogPrint
+import library.system_programme_running as spr
+from front_ends.algo_trade_main_page import AlgoTradeMainPage"""
 
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+# GUI MODULES -------------------------------------------------------------------------------------
+from kivy.app import App
+from kivy.clock import Clock
+from kivy.core.window import Window
+from kivy.lang import Builder
+from kivy.logger import Logger
+from kivy.uix.carousel import Carousel
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
