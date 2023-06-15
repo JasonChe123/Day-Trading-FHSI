@@ -59,3 +59,28 @@ if __name__ == '__main__':
             IS_PRINT_TO_FILE = True
         if 'strategy=' in argu:
             RUNNING_STRATEGIES = argu.lstrip('strategy=').upper().split(',')
+
+    Logger.setLevel(logging.WARNING)
+
+    mylogger = logging.getLogger('root')
+    mylogger.setLevel(logging.INFO)
+
+    file_handler = logging.FileHandler('foo', encoding='utf-8')
+    stream_handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        '%(asctime)s <%(name)s> [ %(levelname)-10s ] %(message)s "%(filename)s:%(lineno)s"',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+
+    stream_handler.setFormatter(formatter)
+    file_handler.setFormatter(formatter)
+    # mylogger.addHandler(handler)
+
+    mylogger.addHandler(file_handler)
+    Logger.addHandler(stream_handler)
+
+    logging.debug('debug')
+    logging.info('info')
+    logging.warning('warning')
+    logging.error('error')
+    logging.critical('critical')
