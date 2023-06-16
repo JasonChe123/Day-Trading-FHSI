@@ -43,6 +43,33 @@ class AnsiEscapeCodeRemover:
         self.file.flush()
 
 
+def config_logging():
+    # set kivy loglevel
+    Logger.setLevel(logging.WARNING)
+
+    # set system loglevel
+    mylogger = logging.getLogger('root')
+    mylogger.setLevel(logging.INFO)
+
+    # set handler
+    file_name = 'demo.log' if IS_DEMO else 'live.log'
+    file_path = os.path.join(PROJECT_DIR, 'database', 'log', file_name)
+    file_handler = logging.FileHandler(file_path, encoding='utf-8')
+    stream_handler = logging.StreamHandler(sys.stdout)
+
+    # set formatter
+    formatter = logging.Formatter(
+        '%(asctime)s <%(name)s> [ %(levelname)-8s ] %(message)s "%(filename)s:%(lineno)s"',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    stream_handler.setFormatter(formatter)
+    file_handler.setFormatter(formatter)
+
+    # add handler
+    mylogger.addHandler(file_handler)
+    mylogger.addHandler(stream_handler)
+
+
 if __name__ == '__main__':
     PROJECT_DIR = os.getcwd()
     IS_DEMO = True
@@ -60,27 +87,15 @@ if __name__ == '__main__':
         if 'strategy=' in argu:
             RUNNING_STRATEGIES = argu.lstrip('strategy=').upper().split(',')
 
-    Logger.setLevel(logging.WARNING)
+    config_logging()
 
-    mylogger = logging.getLogger('root')
-    mylogger.setLevel(logging.INFO)
-
-    file_handler = logging.FileHandler('foo', encoding='utf-8')
-    stream_handler = logging.StreamHandler()
-    formatter = logging.Formatter(
-        '%(asctime)s <%(name)s> [ %(levelname)-10s ] %(message)s "%(filename)s:%(lineno)s"',
-        datefmt='%Y-%m-%d %H:%M:%S'
-    )
-
-    stream_handler.setFormatter(formatter)
-    file_handler.setFormatter(formatter)
-    # mylogger.addHandler(handler)
-
-    mylogger.addHandler(file_handler)
-    Logger.addHandler(stream_handler)
+    import time
+    time.sleep(2)
 
     logging.debug('debug')
     logging.info('info')
     logging.warning('warning')
     logging.error('error')
     logging.critical('critical')
+    print()
+    Logger.warning('kivy warning')

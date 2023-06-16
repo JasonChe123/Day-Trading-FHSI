@@ -1,0 +1,5 @@
+2023-06-16 01:16:21 <root> [ INFO     ] info "main.py:96"
+2023-06-16 01:16:21 <root> [ WARNING  ] warning "main.py:97"
+2023-06-16 01:16:21 <root> [ ERROR    ] error "main.py:98"
+2023-06-16 01:16:21 <root> [ CRITICAL ] critical "main.py:99"
+2023-06-16 01:16:21 <kivy> [ WARNING  ] kivy warning "main.py:101"
