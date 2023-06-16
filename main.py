@@ -7,11 +7,11 @@ import sys
 import threading as th
 
 # PROJECT MODULES ---------------------------------------------------------------------------------
-"""from library.futu_api import FutuApi
-from library.ibapi import IBApi
-from library.printing import LogPrint
-import library.system_programme_running as spr
-from front_ends.algo_trade_main_page import AlgoTradeMainPage"""
+# from library.futu_api import FutuApi
+# from library.ibapi import IBApi
+# from library.printing import LogPrint
+from library import programme
+# from front_ends.algo_trade_main_page import AlgoTradeMainPage
 
 # GUI MODULES -------------------------------------------------------------------------------------
 os.environ['KIVY_LOG_MODE'] = 'MIXED'  # separate logging between python and kivy
@@ -56,13 +56,16 @@ def config_logging():
 
     # set system loglevel
     mylogger = logging.getLogger('root')
-    mylogger.setLevel(logging.INFO)
+    mylogger.setLevel(logging.DEBUG)
 
-    # set handler
+    # define log file path
     file_name = 'demo.log' if IS_DEMO else 'live.log'
     file_path = os.path.join(PROJECT_DIR, 'database', 'log', file_name)
+
+    # set handlers
     file_handler = logging.FileHandler(file_path, encoding='utf-8')
     stream_handler = logging.StreamHandler(sys.stdout)
+    stream_handler.setLevel(logging.DEBUG)  # todo: should be set to INFO, DEBUG is just for developing stage
 
     # set formatter
     file_formatter = logging.Formatter(
@@ -82,6 +85,10 @@ if __name__ == '__main__':
     IS_DEMO = True
     IS_PRINT_TO_FILE = False
     RUNNING_STRATEGIES = []
+    FUTU_USER_NAME = ''
+    FUTU_LOGIN_PWD = ''
+    IB_TWS_USER_NAME = ''
+    IB_TWS_LOGIN_PWD = ''
 
     # check system arguments
     arguments = sys.argv[1:]  # the first argument is file name
@@ -96,3 +103,9 @@ if __name__ == '__main__':
 
     # configure logging
     config_logging()
+
+    # launch futu-openD and tws
+    th.Thread(target=programme.launch_futu_opend, args=[PROJECT_DIR], daemon=True).start()
+
+    import time
+    time.sleep(10)
