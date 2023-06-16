@@ -86,8 +86,6 @@ if __name__ == '__main__':
     IS_DEMO = True
     IS_PRINT_TO_FILE = False
     RUNNING_STRATEGIES = []
-    FUTU_USER_NAME = ''
-    FUTU_LOGIN_PWD = ''
     IB_TWS_USER_NAME = ''
     IB_TWS_LOGIN_PWD = ''
 
@@ -107,3 +105,4 @@ if __name__ == '__main__':
 
     # launch futu-openD and tws
     th.Thread(target=programme.launch_futu_opend, args=[PROJECT_DIR], daemon=True).start()
+    programme.launch_tws(PROJECT_DIR, IB_TWS_USER_NAME, IB_TWS_LOGIN_PWD)
