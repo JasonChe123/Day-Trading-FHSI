@@ -35,19 +35,14 @@ class CustomFormatter(logging.Formatter):
     red = "\x1b[31m"
     black_yellow_bg = "\x1b[30;43m"
     black_red_bg = "\x1b[30;41m"
-    reset = "\x1b[0m"
-
-    start = '%(asctime)s <%(name)s> '
-    message = '[ %(levelname)-8s ] %(message)s '
-    end = '("%(filename)s:%(lineno)s)"'
-    format = '%(asctime)s <%(name)-s> [ %(levelname)-8s ] %(message)s ("%(filename)s:%(lineno)s)"'
+    formatter = lambda colour: f'%(asctime)s <%(name)s> {colour} [ %(levelname)-8s ] %(message)s \x1b[0m ("%(filename)s:%(lineno)s)"'
 
     FORMATS = {
-        logging.DEBUG: start + grey + message + reset + end,
-        logging.INFO: start + white + message + reset + end,
-        logging.WARNING: start + red + message + reset + end,
-        logging.ERROR: start + black_yellow_bg + message + reset + end,
-        logging.CRITICAL: start + black_red_bg + message + reset + end,
+        logging.DEBUG: formatter(grey),
+        logging.INFO: formatter(white),
+        logging.WARNING: formatter(red),
+        logging.ERROR: formatter(black_yellow_bg),
+        logging.CRITICAL: formatter(black_red_bg),
     }
 
     def format(self, record):
