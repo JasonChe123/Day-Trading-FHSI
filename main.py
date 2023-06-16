@@ -1,8 +1,8 @@
 # SYSTEM MODULES ----------------------------------------------------------------------------------
 import logging
-import os
 from pathlib import Path
 import re
+import os
 import sys
 import threading as th
 
@@ -14,14 +14,40 @@ import library.system_programme_running as spr
 from front_ends.algo_trade_main_page import AlgoTradeMainPage"""
 
 # GUI MODULES -------------------------------------------------------------------------------------
+os.environ['KIVY_LOG_MODE'] = 'MIXED'  # separate logging between python and kivy
+import kivy
 from kivy.app import App
 from kivy.clock import Clock
+from kivy.config import Config
 from kivy.core.window import Window
 from kivy.lang import Builder
 from kivy.logger import Logger
 from kivy.uix.carousel import Carousel
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
+
+
+class CustomFormatter(logging.Formatter):
+
+    grey = "\x1b[38;20m"
+    yellow = "\x1b[33;20m"
+    red = "\x1b[31;20m"
+    bold_red = "\x1b[31;1m"
+    reset = "\x1b[0m"
+    format = '%(asctime)s <%(name)s> [ %(levelname)-8s ] %(message)s ("%(filename)s:%(lineno)s)"'
+
+    FORMATS = {
+        logging.DEBUG: grey + format + reset,
+        logging.INFO: grey + format + reset,
+        logging.WARNING: yellow + format + reset,
+        logging.ERROR: red + format + reset,
+        logging.CRITICAL: bold_red + format + reset
+    }
+
+    def format(self, record):
+        log_fmt = self.FORMATS.get(record.levelno)
+        formatter = logging.Formatter(log_fmt, datefmt='%Y-%m-%d %H:%M:%S')
+        return formatter.format(record)
 
 
 class AnsiEscapeCodeRemover:
@@ -58,12 +84,12 @@ def config_logging():
     stream_handler = logging.StreamHandler(sys.stdout)
 
     # set formatter
-    formatter = logging.Formatter(
-        '%(asctime)s <%(name)s> [ %(levelname)-8s ] %(message)s "%(filename)s:%(lineno)s"',
+    file_formatter = logging.Formatter(
+        '%(asctime)s <%(name)s> [ %(levelname)-8s ] %(message)s "(%(filename)s:%(lineno)s)"',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
-    stream_handler.setFormatter(formatter)
-    file_handler.setFormatter(formatter)
+    stream_handler.setFormatter(CustomFormatter())
+    file_handler.setFormatter(file_formatter)
 
     # add handler
     mylogger.addHandler(file_handler)
@@ -77,25 +103,15 @@ if __name__ == '__main__':
     RUNNING_STRATEGIES = []
 
     # check system arguments
-    argus = sys.argv[1:]
-    for argu in argus:
-        argu = argu.lower()
-        if 'demo=' in argu and argu.lstrip('demo=') == 'false':
+    arguments = sys.argv[1:]  # the first argument is file name
+    for argv in arguments:
+        argv = argv.lower()
+        if 'demo=' in argv and argv.lstrip('demo=') == 'false':
             IS_DEMO = False
-        if 'print_to_file=' in argu and argu.lower().lstrip('print_to_file=') == 'true':
+        if 'print_to_file=' in argv and argv.lower().lstrip('print_to_file=') == 'true':
             IS_PRINT_TO_FILE = True
-        if 'strategy=' in argu:
-            RUNNING_STRATEGIES = argu.lstrip('strategy=').upper().split(',')
+        if 'strategy=' in argv:
+            RUNNING_STRATEGIES = argv.lstrip('strategy=').upper().split(',')
 
+    # configure logging
     config_logging()
-
-    import time
-    time.sleep(2)
-
-    logging.debug('debug')
-    logging.info('info')
-    logging.warning('warning')
-    logging.error('error')
-    logging.critical('critical')
-    print()
-    Logger.warning('kivy warning')
