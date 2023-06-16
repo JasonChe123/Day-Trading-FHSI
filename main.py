@@ -29,19 +29,25 @@ from kivy.uix.popup import Popup
 
 class CustomFormatter(logging.Formatter):
 
-    grey = "\x1b[38;20m"
-    yellow = "\x1b[33;20m"
-    red = "\x1b[31;20m"
-    bold_red = "\x1b[31;1m"
+    grey = "\x1b[37m"
+    yellow = "\x1b[33m"
+    white = "\x1b[m"
+    red = "\x1b[31m"
+    black_yellow_bg = "\x1b[30;43m"
+    black_red_bg = "\x1b[30;41m"
     reset = "\x1b[0m"
-    format = '%(asctime)s <%(name)s> [ %(levelname)-8s ] %(message)s ("%(filename)s:%(lineno)s)"'
+
+    start = '%(asctime)s <%(name)s> '
+    message = '[ %(levelname)-8s ] %(message)s '
+    end = '("%(filename)s:%(lineno)s)"'
+    format = '%(asctime)s <%(name)-s> [ %(levelname)-8s ] %(message)s ("%(filename)s:%(lineno)s)"'
 
     FORMATS = {
-        logging.DEBUG: grey + format + reset,
-        logging.INFO: grey + format + reset,
-        logging.WARNING: yellow + format + reset,
-        logging.ERROR: red + format + reset,
-        logging.CRITICAL: bold_red + format + reset
+        logging.DEBUG: start + grey + message + reset + end,
+        logging.INFO: start + white + message + reset + end,
+        logging.WARNING: start + red + message + reset + end,
+        logging.ERROR: start + black_yellow_bg + message + reset + end,
+        logging.CRITICAL: start + black_red_bg + message + reset + end,
     }
 
     def format(self, record):
@@ -106,6 +112,3 @@ if __name__ == '__main__':
 
     # launch futu-openD and tws
     th.Thread(target=programme.launch_futu_opend, args=[PROJECT_DIR], daemon=True).start()
-
-    import time
-    time.sleep(10)
