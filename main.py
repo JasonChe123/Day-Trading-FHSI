@@ -11,7 +11,7 @@ import threading as th
 # from library.ibapi import IBApi
 # from library.printing import LogPrint
 from library import programme
-# from front_ends.algo_trade_main_page import AlgoTradeMainPage
+from front_ends.algo_trade_main_page import AlgoTradeMainPage
 
 # GUI MODULES -------------------------------------------------------------------------------------
 os.environ['KIVY_LOG_MODE'] = 'MIXED'  # separate logging between python and kivy
@@ -63,7 +63,11 @@ class AlgoTradeForFHSI(App):
 
     # kivy's predefined methods -------------------------------------------------------------------
     def build(self):
-        pass
+        self.popup = Popup(title='Information', size_hint=(0.8, 0.3), auto_dismiss=True)
+        self.carousel = Carousel(direction='right', scroll_timeout=0)
+        self.algo_main_page = AlgoTradeMainPage()
+        self.carousel.add_widget(self.algo_main_page)
+        return self.carousel
 
     def on_start(self):
         pass
@@ -143,6 +147,6 @@ if __name__ == '__main__':
     [Builder.load_file(os.path.join(kv_dir, kv_file)) for kv_file in kv_files]
 
     # build gui
-    Window.size = (700, 1200)
+    Window.size = (500, 1000)
     app = AlgoTradeForFHSI()
     app.run()
