@@ -51,6 +51,35 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 
+class AlgoTradeForFHSI(App):
+    proj_dir = ''  # for the initialization of its children
+
+    def __init__(self):
+        super().__init__()
+        self.proj_dir = PROJECT_DIR  # for kv files loading images at the very beginning
+        self.engine = 'live'  # live/ backtest: control behaviour like 'update_kline' and 'fire_trade'
+        self.is_demo = IS_DEMO  # live/ demo: control behaviour like 'place_order' and accessing account info
+        self.running_strategies = RUNNING_STRATEGIES
+
+    # kivy's predefined methods -------------------------------------------------------------------
+    def build(self):
+        pass
+
+    def on_start(self):
+        pass
+
+    def on_stop(self):
+        pass
+
+    # strategy's callback -------------------------------------------------------------------------
+    def callback(self):
+        pass
+
+    # helper methods ------------------------------------------------------------------------------
+    def helper(self):
+        pass
+
+
 def config_logging():
     # set kivy loglevel
     Logger.setLevel(logging.WARNING)
@@ -112,3 +141,8 @@ if __name__ == '__main__':
     kv_files = [kv_file for kv_file in os.listdir(kv_dir) if os.path.splitext(kv_file)[1] == '.kv']
     kv_files.sort()
     [Builder.load_file(os.path.join(kv_dir, kv_file)) for kv_file in kv_files]
+
+    # build gui
+    Window.size = (700, 1200)
+    app = AlgoTradeForFHSI()
+    app.run()
