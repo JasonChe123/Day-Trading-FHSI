@@ -1,0 +1,107 @@
+<MySpinnerOption@SpinnerOption>:
+    size: 150, 35
+    size_hint: None, None
+    background_color: (0.5, 1, 1, 1)
+
+<TradeJournal>:
+    # --- main frame ---
+    BoxLayout:
+        orientation: 'vertical'
+        size: root.size
+        size_hint: (1.0, 1.0)
+
+        # --- select date ---
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1.0, 0.15
+            size: 0, 0
+            spacing: 10
+
+            Label:
+                text: 'From'
+                size: self.texture_size
+                size_hint: (None, None)
+                pos_hint: {'center_y': 0.5}
+
+            Label:
+                id: label_date_from
+                size: self.texture_size
+                size_hint: (None, None)
+                pos_hint: {'center_y': 0.5}
+                color: (0.5, 1, 1)
+
+            IconButton:
+                size: (40, 40)
+                size_hint: (None, None)
+                pos_hint: {'center_y': 0.5}
+                background_normal: f'{app.proj_dir}/library/images/calendar.png'
+                on_press: root.show_calendar('start')
+
+            Label:
+                text: 'to'
+                size: self.texture_size
+                size_hint: (None, None)
+                pos_hint: {'center_y': 0.5}
+
+            Label:
+                id: label_date_to
+
+                size: self.texture_size
+                size_hint: (None, None)
+                color: (0.5, 1, 1)
+                pos_hint: {'center_y': 0.5}
+
+            IconButton:
+                size: (40, 40)
+                size_hint: (None, None)
+                pos_hint: {'center_y': 0.5}
+                background_normal: f'{app.proj_dir}/library/images/calendar.png'
+                on_press: root.show_calendar('end')
+
+            Widget:
+
+            RoundedButton:
+                text: 'Refresh'
+                background_color: (0.2, 0.2, 0.8, 0.5)
+                canvas.before:
+                    Color:
+                        rgba: (0.2, 0.2, 0.8, 0.5)
+                    RoundedRectangle:
+                        size: self.size
+                        pos: self.pos
+                        radius: [5]
+                on_press: root.refresh(self)
+
+        # --- filter ---
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1.0, 0.1
+            size: 0, 0
+            padding: 5
+            spacing: 10
+
+            Label:
+                text: 'Strategy Filter'
+                font_size: 16
+                size: self.texture_size
+                valign: 'middle'
+
+            Spinner:
+                id: filter
+                text: 'ALL'
+                size_hint: None, None
+                size: 150, 35
+                background_color: (0.5, 1, 1, 1)
+                option_cls: 'MySpinnerOption'
+                on_text: root.update_filter(self)
+
+            Widget:
+
+        # --- trade journal table ---
+        DataFrameTable:
+            size: root.size
+            GridLayout:
+                id: data_table
+                size: (self.minimum_width, self.minimum_height)
+                size_hint: (None, None)
+                spacing: 1

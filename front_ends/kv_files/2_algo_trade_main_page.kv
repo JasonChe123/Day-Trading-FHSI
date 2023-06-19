@@ -1,0 +1,148 @@
+<AlgoTradeMHIMainPage>:
+    # --- main frame ---
+    BoxLayout:
+        orientation: 'vertical'
+        size: root.size
+        padding: 10
+        canvas:
+            Color:
+                # rgba: algo_trade_background
+                rgba: color_map.get('bg')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        # --- secondary frame ---
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 1.0, 0.9
+            size: 0, 0
+
+            # header ----------------------------------------------------------
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint: 1.0, 0.1
+                size: 0, 0
+
+                Label:
+                    id: headline
+                    font_size: 18
+
+            # --- carousel object displaying different pages ---
+            Carousel:
+                id: content
+                direction: 'right'
+                scroll_timeout: 2
+
+        # page selection ------------------------------------------------------
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: (1.0, None)
+            size: (0, 90)
+
+            canvas:
+                Color:
+                    rgb: 1, 1, 0
+                Rectangle:
+                    pos: 0 + 10, self.y + self.height
+                    size: root.width - 20, 0.5
+
+            PageButton:
+                IconButton:
+                    size: 60, 60
+                    pos_hint: {'center_x': 0.5}
+                    background_normal: f'{app.proj_dir}/library/images/algo_trade.png'
+                    background_down: f'{app.proj_dir}/library/images/algo_trade.png'
+                    on_press: root.show_slide('algo_trade')
+                PageButtonLabel:
+                    size_hint: (0.6, 0.3)
+                    text: 'Algo Trade'
+
+            PageButton:
+                IconButton:
+                    size: 60, 60
+                    pos_hint: {'center_x': 0.5}
+                    background_normal: f'{app.proj_dir}/library/images/trade_journal.png'
+                    background_down: f'{app.proj_dir}/library/images/trade_journal.png'
+                    on_press: root.show_slide('trade_journal')
+                PageButtonLabel:
+                    size_hint: (0.6, 0.3)
+                    text: 'History'
+
+            PageButton:
+                IconButton:
+                    size: 60, 60
+                    pos_hint: {'center_x': 0.5}
+                    background_normal: f'{app.proj_dir}/library/images/account_info.png'
+                    background_down: f'{app.proj_dir}/library/images/account_info.png'
+                    on_press: root.show_slide('account_info')
+                PageButtonLabel:
+                    size_hint: (0.6, 0.3)
+                    text: 'Acc Info'
+
+            PageButton:
+                IconButton:
+                    size: 60, 60
+                    pos_hint: {'center_x': 0.5}
+                    background_normal: f'{app.proj_dir}/library/images/inventory.png'
+                    background_down: f'{app.proj_dir}/library/images/inventory.png'
+                    on_press: root.show_slide('position')
+                PageButtonLabel:
+                    size_hint: (0.6, 0.3)
+                    text: 'Position'
+
+            PageButton:
+                IconButton:
+                    size: 60, 60
+                    pos_hint: {'center_x': 0.5}
+                    background_normal: f'{app.proj_dir}/library/images/report.png'
+                    background_down: f'{app.proj_dir}/library/images/report.png'
+                    on_press: root.show_slide('report')
+                PageButtonLabel:
+                    size_hint: (0.6, 0.3)
+                    text: 'Report'
+
+        # show date and time --------------------------------------------------
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1.0, 0.05
+            size: 0, 0
+
+            canvas.before:
+                Color:
+                    rgba: (0.4, 0.7, 0.7, 0.7)
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+
+            Label:
+                id: label_time
+                font_size: 20
+
+        # show connection status ----------------------------------------------
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1.0, 0.05
+            size: 0, 0
+
+            Label:
+                text: 'Futu: '
+                size: self.texture_size
+                size_hint: None, None
+            Label:
+                id: futu_conn
+                size: self.texture_size
+                size_hint: None, None
+            Widget:
+                size: 40, 0
+                size_hint: None, None
+
+            Label:
+                text: 'IB: '
+                size: self.texture_size
+                size_hint: None, None
+            Label:
+                id: ib_conn
+                size: self.texture_size
+                size_hint: None, None
+            Widget:

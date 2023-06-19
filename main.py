@@ -104,7 +104,11 @@ if __name__ == '__main__':
     config_logging()
 
     # launch futu-openD and tws
-    th.Thread(target=programme.launch_futu_opend, args=[PROJECT_DIR], daemon=True).start()
-    programme.launch_tws(PROJECT_DIR, IB_TWS_USER_NAME, IB_TWS_LOGIN_PWD)  # todo: should send alert if searching for too long e.g. 10mins
+    # th.Thread(target=programme.launch_futu_opend, args=[PROJECT_DIR], daemon=True).start()
+    # programme.launch_tws(PROJECT_DIR, IB_TWS_USER_NAME, IB_TWS_LOGIN_PWD)  # todo: should send alert if searching for too long e.g. 10mins
 
-
+    # load kv files
+    kv_dir = os.path.join(PROJECT_DIR, 'front_ends', 'kv_files')
+    kv_files = [kv_file for kv_file in os.listdir(kv_dir) if os.path.splitext(kv_file)[1] == '.kv']
+    kv_files.sort()
+    [Builder.load_file(os.path.join(kv_dir, kv_file)) for kv_file in kv_files]

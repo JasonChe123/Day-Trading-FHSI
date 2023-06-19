@@ -1,0 +1,15 @@
+<AccountInfo>:
+    # --- main frame ---
+    BoxLayout:
+        orientation: 'vertical'
+        size: root.size
+        size_hint: (1.0, 1.0)
+
+        # --- trade journal table ---
+        DataFrameTable:
+            size: root.size
+            GridLayout:
+                id: funds_table
+                size: (0, self.minimum_height)
+                size_hint: (1.0, None)
+                spacing: (10, 1)

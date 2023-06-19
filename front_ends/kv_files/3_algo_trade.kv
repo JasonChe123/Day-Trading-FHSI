@@ -1,0 +1,160 @@
+<AlgoTrade>:
+    # --- main frame ---
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint: None ,None
+        size: root.size
+
+        # --- start, stop and cover all buttons ---
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1.0, 0.1
+            size: 0, 0
+            spacing: 10
+
+            RoundedButton:
+                text: 'Start All'
+                on_press: root.start_all(self)
+
+            RoundedButton:
+                text: 'Stop All'
+                background_color: (0.9, 0.2, 0.2, 0.5)
+                canvas.before:
+                    Color:
+                        rgba: (0.9, 0.2, 0.2, 0.5)
+                    RoundedRectangle:
+                        size: self.size
+                        pos: self.pos
+                        radius: [5]
+                on_press: root.stop_all(self)
+
+            RoundedButton:
+                text: 'Cover All'
+                on_press: root.cover_all(self)
+
+        # --- auto shutdown PC options ---
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1.0, 0.1
+            size: 0, 0
+            spacing: 10
+
+            CheckBox:
+                id: checkbox_auto_shutdown
+                active: True
+                size_hint: (None, None)
+                size: (50, 50)
+                pos_hint: {'center_y': 0.5}
+                on_press: root.update_auto_shutdown(self)
+
+            Label:
+                text: 'Auto ShutDown PC'
+                size_hint: (None, None)
+                pos_hint: {'center_y': 0.5}
+
+        # --- select date ---
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1.0, 0.1
+            size: 0, 0
+            spacing: 10
+
+            Label:
+                text: 'From'
+                size: self.texture_size
+                size_hint: (None, None)
+                pos_hint: {'center_y': 0.5}
+
+            Label:
+                id: label_date_from
+                size: self.texture_size
+                size_hint: (None, None)
+                pos_hint: {'center_y': 0.5}
+                color: (0.5, 1, 1)
+
+            IconButton:
+                size: (40, 40)
+                size_hint: (None, None)
+                pos_hint: {'center_y': 0.5}
+                background_normal: f'{app.proj_dir}/library/images/calendar.png'
+                on_press: root.show_calendar('start')
+
+            Label:
+                text: 'to'
+                size: self.texture_size
+                size_hint: (None, None)
+                pos_hint: {'center_y': 0.5}
+
+            Label:
+                id: label_date_to
+
+                size: self.texture_size
+                size_hint: (None, None)
+                color: (0.5, 1, 1)
+                pos_hint: {'center_y': 0.5}
+
+            IconButton:
+                size: (40, 40)
+                size_hint: (None, None)
+                pos_hint: {'center_y': 0.5}
+                background_normal: f'{app.proj_dir}/library/images/calendar.png'
+                on_press: root.show_calendar('end')
+
+            Widget:
+
+            RoundedButton:
+                text: 'Refresh'
+                background_color: (0.2, 0.2, 0.8, 0.5)
+                canvas.before:
+                    Color:
+                        rgba: (0.2, 0.2, 0.8, 0.5)
+                    RoundedRectangle:
+                        size: self.size
+                        pos: self.pos
+                        radius: [5]
+                on_press: root.refresh(self)
+
+        Widget:
+            size: 0, 10
+            size_hint: 1, None
+
+        # --- algo trade table ---
+        DataFrameTable:
+            size: root.size
+            GridLayout:
+                id: data_table
+                size: (self.minimum_width, 0)
+                size_hint: (None, 1.0)
+                spacing: 1
+
+        # --- realtime OHLC ---
+        BoxLayout:
+            orientation: 'horizontal'
+            size: 0, 0
+            size_hint: 1.0, 0.1
+            spacing: 9
+            Label:
+                text: 'Open'
+                color: (1, 1, 1, 0.5)
+            Label:
+                id: open
+                text: '00000'
+            Label:
+                text: 'High'
+                color: (1, 1, 1, 0.5)
+            Label:
+                id: high
+                text: '00000'
+            Label:
+                text: 'Low'
+                color: (1, 1, 1, 0.5)
+            Label:
+                id: low
+                text: '00000'
+            Label:
+                text: 'Close'
+                color: (1, 1, 1, 0.5)
+            Label:
+                id: close
+                text: '00000'
+                markup: True
