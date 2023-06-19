@@ -72,29 +72,29 @@ def search_image_on_screen(img_path: os.path, confidence: float, grayscale: bool
     screen_width, screen_height = auto_gui.size()
 
     # search
-    vector = 1
+    vector = 1  # to define searching for enlarged size or reduced size
     for index in range(1, 9999):
         logging.info(f"Searching {os.path.basename(img_path)}, size: {searching_w}x{searching_h}")
         element = auto_gui.locateOnScreen(image, confidence=confidence, grayscale=grayscale)
         if element:
             return element
 
-        # searching
+        # searching for different sizes
         searching_w = image_width * (1 + index*scale_factor) * vector
         searching_h = image_height * (1 + index*scale_factor) * vector
 
         # if searching size is too large
-        if any([searching_w >= screen_width,
-                searching_h >= screen_height,
-                searching_w >= image_width * max_scale]):
-            vector = -1
+        if vector == 1 and any([searching_w >= screen_width,
+                                searching_h >= screen_height,
+                                searching_w >= image_width * max_scale]):
+            vector = -1  # search for reduced size
+            # reset size
             searching_w = image_width
             searching_h = image_height
 
-        # if search size is too small
+        # if search size is too small, end searching loop
         elif searching_w <= image_width / max_scale:
             return None
 
-        image = image.resize(
-            (int(searching_w), int(searching_h))
-        )
+        # resize for the next loop
+        image = image.resize((int(searching_w), int(searching_h)))
