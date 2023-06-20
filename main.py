@@ -7,14 +7,12 @@ import sys
 import threading as th
 
 # PROJECT MODULES ---------------------------------------------------------------------------------
-# from library.futu_api import FutuApi
-# from library.ibapi import IBApi
-# from library.printing import LogPrint
+from library.futu_api import FutuApi
+from library.ibapi import IBApi
 from library import programme
 from front_ends.algo_trade_main_page import AlgoTradeMainPage
 
 # GUI MODULES -------------------------------------------------------------------------------------
-os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
 import kivy
 from kivy.app import App
 from kivy.clock import Clock
@@ -71,7 +69,7 @@ class AlgoTradeForFHSI(App):
         return self.carousel
 
     def on_start(self):
-        pass
+        self.connect_brokers()
 
     def on_stop(self):
         pass
@@ -81,8 +79,8 @@ class AlgoTradeForFHSI(App):
         pass
 
     # helper methods ------------------------------------------------------------------------------
-    def helper(self):
-        pass
+    def connect_brokers(self):
+        self.futu = FutuApi()
 
 
 def config_logging():
@@ -116,6 +114,7 @@ def config_logging():
 
 
 if __name__ == '__main__':
+    os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
     PROJECT_DIR = os.getcwd()
     IS_DEMO = True
     IS_PRINT_TO_FILE = False
