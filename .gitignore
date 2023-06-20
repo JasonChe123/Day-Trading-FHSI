@@ -1,8 +1,8 @@
 .idea/
 __pycache__/
+database/log/demo.log
+database/log/live.log
 front_ends/__pycache__/
 futu_openD/
 algo_trade.cpython-311.pyc
 algo_trade_main_page.cpython-311.pyc
-demo.log
-live.log
