@@ -37,7 +37,7 @@ class AlgoTradeMainPage(Widget):
 
     def show_slide(self, slide):
         for page in self.slides:
-            self.carousel.load_slide(page) if page.ids == slide else None
+            self.carousel.load_slide(page) if page.id == slide else None
             if slide == 'account_info':
                 # update data
                 pass

@@ -38,17 +38,26 @@ class TradeJournal(Widget):
         pass
 
     def update_date(self, start_or_end: str):
-        pass
+        """
+        update labels of date
+        """
+        if start_or_end == 'start':
+            self.start_date = dt.datetime.strptime(self.calendar.text, '%d.%m.%Y')
+            self.ids.label_date_from.text = dt.datetime.strftime(self.start_date, '%d-%b-%y')
+        else:
+            self.end_date = dt.datetime.strptime(self.calendar.text, '%d.%m.%Y')
+            self.ids.label_date_to.text = dt.datetime.strftime(self.end_date, '%d-%b-%y')
 
     def update_table(self, df):
         pass
 
     # buttons' callback ---------------------------------------------------------------------------
     def show_calendar(self, start_or_end: str):
-        pass
+        self.calendar.show_popup(1, 0.5)
+        self.calendar.update = start_or_end
 
     def refresh(self, instance=None):
-        pass
+        print("refresh ", self.start_date, self.end_date)
 
     def update_filter(self, instance=None):
         pass
