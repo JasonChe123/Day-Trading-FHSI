@@ -1,3 +1,6 @@
 2023-06-20 13:25:07 <root> [ DEBUG    ] Start launching Futu-OpenD. "(programme.py:13)"
 2023-06-20 13:25:07 <root> [ DEBUG    ] This is not a server, please make sure IB TWS is running and accepted this connection. "(programme.py:32)"
 2023-06-20 13:25:07 <root> [ DEBUG    ] FutuOpenD is already run. "(programme.py:22)"
+2023-06-20 13:32:16 <root> [ DEBUG    ] Start launching Futu-OpenD. "(programme.py:13)"
+2023-06-20 13:32:16 <root> [ DEBUG    ] This is not a server, please make sure IB TWS is running and accepted this connection. "(programme.py:32)"
+2023-06-20 13:32:16 <root> [ DEBUG    ] FutuOpenD is already run. "(programme.py:22)"
