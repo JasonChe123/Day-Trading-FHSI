@@ -147,6 +147,6 @@ if __name__ == '__main__':
     [Builder.load_file(os.path.join(kv_dir, kv_file)) for kv_file in kv_files]
 
     # build gui
-    Window.size = (500, 1000)
+    Window.size = (450, 800)
     app = AlgoTradeForFHSI()
     app.run()
