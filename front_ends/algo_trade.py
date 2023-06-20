@@ -1,6 +1,8 @@
 import datetime as dt
 import pandas as pd
+import os
 
+os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.checkbox import CheckBox

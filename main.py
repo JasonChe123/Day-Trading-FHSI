@@ -14,7 +14,7 @@ from library import programme
 from front_ends.algo_trade_main_page import AlgoTradeMainPage
 
 # GUI MODULES -------------------------------------------------------------------------------------
-os.environ['KIVY_LOG_MODE'] = 'MIXED'  # separate logging between python and kivy
+os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
 import kivy
 from kivy.app import App
 from kivy.clock import Clock

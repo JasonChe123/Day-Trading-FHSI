@@ -5,12 +5,13 @@ from kivy.app import App
 from kivy.uix.widget import Widget
 
 
-class AccountInfo(Widget):
-    id = 'account_info'
+class Position(Widget):
+    id = 'position'
 
     def __init__(self):
         super().__init__()
         self.main_app = App.get_running_app()
+        self.project_directory = self.main_app.proj_dir
 
     def update_data(self):
         pass

@@ -1,9 +1,12 @@
 import datetime as dt
+import os
 
 from front_ends.algo_trade import AlgoTrade
 from front_ends.trade_journal import TradeJournal
 from front_ends.account_info import AccountInfo
+from front_ends.position import Position
 
+os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.widget import Widget
@@ -29,9 +32,10 @@ class AlgoTradeMainPage(Widget):
         self.algo_trade = AlgoTrade()
         self.trade_journal = TradeJournal()
         self.account_info = AccountInfo()
+        self.position = Position()
 
         # add pages
-        for page in (self.algo_trade, self.trade_journal, self.account_info):
+        for page in (self.algo_trade, self.trade_journal, self.account_info, self.position):
             self.carousel.add_widget(page)
 
         # run clock
