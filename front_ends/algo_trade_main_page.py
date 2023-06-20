@@ -1,6 +1,7 @@
 import datetime as dt
 
 from front_ends.algo_trade import AlgoTrade
+from front_ends.trade_journal import TradeJournal
 
 from kivy.app import App
 from kivy.clock import Clock
@@ -22,11 +23,13 @@ class AlgoTradeMainPage(Widget):
         lbl_headline = self.ids['headline']  # get label from 'id' in kv file
         lbl_headline.text = f'{headline_text}  (  {mode}  )'
 
+    def create_pages(self):
         # create pages
         self.algo_trade = AlgoTrade()
+        self.trade_journal = TradeJournal()
 
         # add pages
-        for page in (self.algo_trade, ):
+        for page in (self.algo_trade, self.trade_journal):
             self.carousel.add_widget(page)
 
         # run clock
@@ -34,7 +37,7 @@ class AlgoTradeMainPage(Widget):
 
     def show_slide(self, slide):
         for page in self.slides:
-            self.carousel.load_slide(page) if page.id == slide else None
+            self.carousel.load_slide(page) if page.ids == slide else None
             if slide == 'account_info':
                 # update data
                 pass

@@ -66,6 +66,7 @@ class AlgoTradeForFHSI(App):
         self.popup = Popup(title='Information', size_hint=(0.8, 0.3), auto_dismiss=True)
         self.carousel = Carousel(direction='right', scroll_timeout=0)
         self.algo_main_page = AlgoTradeMainPage()
+        self.algo_main_page.create_pages()
         self.carousel.add_widget(self.algo_main_page)
         return self.carousel
 

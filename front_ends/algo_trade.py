@@ -13,7 +13,7 @@ from KivyCalendar import DatePicker
 class Calendar(DatePicker):
     def __init__(self, algo_trade):
         super().__init__()
-        self.update = ''
+        self.update = ''  # update string: 'start'/ 'end'
         self.algo_trade = algo_trade
 
     def update_value(self, inst):
@@ -126,25 +126,25 @@ class AlgoTrade(Widget):
                 """
 
     # buttons' callback ---------------------------------------------------------------------------
-    def start_all(self, instance):
+    def start_all(self, instance=None):
         print("start all")
 
-    def stop_all(self, instance):
+    def stop_all(self, instance=None):
         print("stop all")
 
-    def cover_all(self, instance):
+    def cover_all(self, instance=None):
         print("cover all")
 
-    def refresh(self, instance):
+    def refresh(self, instance=None):
         print("refresh", self.start_date, self.end_date)
 
-    def update_auto_shutdown(self, instance):
+    def update_auto_shutdown(self, instance=None):
         print("update auto shutdown", instance.active)
 
     def set_on_off_algo(self):
         print("set on/off algo")
 
-    def manual_order(self, instance, strategy_name: str, operation: str):
+    def manual_order(self, strategy_name: str, operation: str, instance=None):
         print("manual order")
 
     # helper methods ------------------------------------------------------------------------------
