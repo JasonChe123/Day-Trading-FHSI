@@ -1,3 +1,4 @@
+import logging
 import os
 
 os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]

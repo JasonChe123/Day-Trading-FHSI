@@ -13,6 +13,7 @@ from library import programme
 from front_ends.algo_trade_main_page import AlgoTradeMainPage
 
 # GUI MODULES -------------------------------------------------------------------------------------
+os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
 import kivy
 from kivy.app import App
 from kivy.clock import Clock
@@ -33,7 +34,7 @@ class CustomFormatter(logging.Formatter):
     red = "\x1b[31m"
     black_yellow_bg = "\x1b[30;43m"
     black_red_bg = "\x1b[30;41m"
-    formatter = lambda colour: f'%(asctime)s <%(name)s> {colour} [ %(levelname)-8s ] %(message)s \x1b[0m ("%(filename)s:%(lineno)s)"'
+    formatter = lambda colour: f'%(asctime)s <%(name)s> {colour} [ %(levelname)-8s ] %(message)s \x1b[0m ("%(filename)s:%(lineno)s")'
 
     FORMATS = {
         logging.DEBUG: formatter(grey),
@@ -114,7 +115,6 @@ def config_logging():
 
 
 if __name__ == '__main__':
-    os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
     PROJECT_DIR = os.getcwd()
     IS_DEMO = True
     IS_PRINT_TO_FILE = False
