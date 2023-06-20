@@ -90,7 +90,7 @@ def config_logging():
 
     # set system loglevel
     mylogger = logging.getLogger('root')
-    mylogger.setLevel(logging.DEBUG)
+    mylogger.setLevel(logging.DEBUG)  # todo: turn it to INFO while finish testing
 
     # define log file path
     file_name = 'demo.log' if IS_DEMO else 'live.log'
