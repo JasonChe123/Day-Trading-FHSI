@@ -44,7 +44,7 @@ class AlgoTradeForFHSI(App):
         self.connect_brokers()
 
     def on_stop(self):
-        pass
+        self.futu.close_all_connection()
 
     # ------------------------------------------------------------------------------------------- #
     """ strategy callback """
@@ -110,7 +110,3 @@ if __name__ == '__main__':
     Window.size = (450, 800)
     app = AlgoTradeForFHSI()
     app.run()
-
-    # close connection
-    app.futu.qot_ctx.close()
-    app.futu.trd_ctx.close()

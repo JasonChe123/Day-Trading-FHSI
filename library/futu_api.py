@@ -47,6 +47,9 @@ class FutuApi:
         self.contract_detail = {}  # to be set later
         self.timer = th.Timer(0, lambda: 0)
 
+    # ------------------------------------------------------------------------------------------- #
+    """ broker connection """
+    # ------------------------------------------------------------------------------------------- #
     def connect(self, unlock_trade_password: int) -> bool:
         if is_running('FutuOpenD.exe'):
             # connect futu-api
@@ -63,6 +66,12 @@ class FutuApi:
         else:
             self.timer = th.Timer(10.0, self.connect)
             self.timer.start()
+
+    def close_all_connection(self):
+        self.timer.cancel()
+        if self.qot_ctx is not None and self.trd_ctx is not None:
+            self.qot_ctx.close()
+            self.trd_ctx.close()
 
     def init_params(self, unlock_trade_password):
         result = self.set_contract_info()
