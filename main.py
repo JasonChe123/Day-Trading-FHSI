@@ -46,6 +46,7 @@ class AlgoTradeForFHSI(App):
 
     def on_stop(self):
         self.futu.close_all_connection()
+        self.ibapi.disconnect()
 
     # ------------------------------------------------------------------------------------------- #
     """ strategy callback """
@@ -60,11 +61,10 @@ class AlgoTradeForFHSI(App):
         self.futu = FutuApi()
         self.ibapi = IBApi()
         self.futu.connect(unlock_trade_password=FUTU_UNLOCK_TRADE_PASSWORD)
-        Clock.schedule_once(self.ibapi.init_connection, 60)
+        self.ibapi.init_connection()
 
 
 if __name__ == '__main__':
-    # os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
     PROJECT_DIR = os.getcwd()
     IS_DEMO = True
     IS_PRINT_TO_FILE = False

@@ -43,8 +43,8 @@ def launch_tws(project_dir, user_name: str, password: str):
                       f'username={user_name}',
                       f'password={password}',
                       'enter-readonly=True'])
-    logging.info("Allow 30 seconds for TWS startup...")
-    time.sleep(30)
+    logging.info("Allow 60 seconds for TWS startup...")
+    time.sleep(60)
 
     # search 2-factors authentication
     img_path = os.path.join(project_dir, 'library', 'images', 'ib_2_factors_authentication.png')
