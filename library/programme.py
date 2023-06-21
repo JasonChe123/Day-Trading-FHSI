@@ -14,7 +14,7 @@ def launch_futu_opend(project_dir):
 
     # define programme name (only concern linux and windows)
     operation_system = sys.platform
-    programme_name = 'FutuOpenD' if operation_system == 'linux' else 'FutuOpenD.exe'
+    programme_name = 'FutuOpenD.exe'
     programme_path = os.path.join(project_dir, 'futu_openD', programme_name)
 
     # check if already run
@@ -57,9 +57,12 @@ def launch_tws(project_dir, user_name: str, password: str):
 
 
 def is_running(programme_name: str = '') -> bool:
+    programme_name = (os.path.splitext(programme_name)[0].lower())
     for process in psutil.process_iter(['pid', 'name']):
-        if process.info['name'] == programme_name and process.status() in ['running', 'sleeping']:
-            return True
+        if os.path.splitext(process.info['name'])[0].lower() == programme_name:
+            if process.status() in ['running', 'sleeping']:
+                return True
+
     return False
 
 

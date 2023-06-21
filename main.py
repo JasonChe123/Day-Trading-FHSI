@@ -6,7 +6,7 @@ import threading as th
 
 # PROJECT MODULES ---------------------------------------------------------------------------------
 from library.futu_api import FutuApi
-from library.ibapi import IBApi
+from library.ib_api import IBApi
 from library import programme
 from library.logging_ import config_logging
 from front_ends.algo_trade_main_page import AlgoTradeMainPage
@@ -29,7 +29,9 @@ class AlgoTradeForFHSI(App):
         self.is_demo = IS_DEMO  # live/ demo: control behaviour like 'place_order' and accessing account info
         self.running_strategies = RUNNING_STRATEGIES
 
-    # kivy's predefined methods -------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------- #
+    """ kivy's pre-defined methods """
+    # ------------------------------------------------------------------------------------------- #
     def build(self):
         self.popup = Popup(title='Information', size_hint=(0.8, 0.3), auto_dismiss=True)
         self.carousel = Carousel(direction='right', scroll_timeout=0)
@@ -44,13 +46,19 @@ class AlgoTradeForFHSI(App):
     def on_stop(self):
         pass
 
-    # strategy's callback -------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------- #
+    """ strategy callback """
+    # ------------------------------------------------------------------------------------------- #
     def callback(self):
         pass
 
-    # helper methods ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------- #
+    """ helper methods """
+    # ------------------------------------------------------------------------------------------- #
     def connect_brokers(self):
         self.futu = FutuApi()
+        self.ibapi = IBApi()
+        self.futu.connect()
 
 
 if __name__ == '__main__':

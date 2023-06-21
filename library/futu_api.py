@@ -5,6 +5,10 @@ import pandas as pd
 import threading as th
 import uuid
 
+from library.programme import is_running
+
+import futu as ft
+
 os.environ['KIVY_LOG_MODE'] = 'MIXED'
 from kivy.app import App
 from kivy.clock import Clock
@@ -27,9 +31,19 @@ class FutuApi:
         self.contract_detail = {}  # to be set later
         self.timer = th.Timer(0, lambda: 0)
 
-        # initialize gui: algo_trade, history (for today)
-        start_date = end_date = dt.date.today() - dt.timedelta(days=1) if dt.datetime.now().hour < 3 else dt.date.today()
-        Clock.schedule_once(lambda t: self.init_gui(start_date, end_date), 1)
+    def connect(self):
+        if is_running('FutuOpenD.exe'):
+            # connect futu-api
+            if not self.qot_ctx or not self.trd_ctx:
+                self.qot_ctx = ft.OpenQuoteContext()
+                self.trd_ctx = ft.OpenFutureTradeContext()
+
+            if self.trd_ctx.status == 'REDAY':
+                # set contract info
+                result = self.set_contract_info()
+
+    def set_contract_info(self) -> bool:
+        pass
 
     # ------------------------------------------------------------------------------------------- #
     """ database operation """
@@ -48,15 +62,10 @@ class FutuApi:
     """ update gui """
     # ------------------------------------------------------------------------------------------- #
     def init_gui(self, start_date: dt.date, end_date: dt.date):
-        trade_journal = self.get_trade_journal()
-        if trade_journal.empty:
-            return
-
-        trade_jounal = self.filter_trade_journal(trade_journal, start_date, end_date)
-        algo_table = self.get_algo_table(trade_journal)
+        pass
 
     def refresh_algo_trade(self, trade_journal):
-        algo_table = self.get_algo_table(trade_journal)
+        pass
 
     # ------------------------------------------------------------------------------------------- #
     """ helper methods """
@@ -71,12 +80,13 @@ class FutuApi:
         """
         convert trade journal to algo table
         """
-        cols = ['Status', 'Strategy', 'ExecSet', 'Inventory', 'P / L', 'MaxCtrt', 'AvgPrice', 'TradedQty',
-                'Fees', 'Order', 'InitMargin']
-        logging.error(self.algo.strategies)
-        for i, strategy_name in enumerate(self.algo.strategies.keys()):
-            logging.info(strategy_name)
-            position, average_price, traded_qty, fees, pnl_value = self.cal_algo_data(trade_journal, strategy_name)
+        pass
+        # cols = ['Status', 'Strategy', 'ExecSet', 'Inventory', 'P / L', 'MaxCtrt', 'AvgPrice', 'TradedQty',
+        #         'Fees', 'Order', 'InitMargin']
+        # logging.error(self.algo.strategies)
+        # for i, strategy_name in enumerate(self.algo.strategies.keys()):
+        #     logging.info(strategy_name)
+        #     position, average_price, traded_qty, fees, pnl_value = self.cal_algo_data(trade_journal, strategy_name)
 
     def cal_algo_data(self, trade_journal: pd.DataFrame, strategy_name: str) -> (int, int, int, int, int):
         pass
