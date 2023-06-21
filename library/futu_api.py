@@ -1,7 +1,6 @@
 import logging
 import os
-os.environ['KIVY_LOG_MODE'] = 'MIXED'  # ['KIVY', 'PYTHON', 'MIXED']
-
+os.environ['KIVY_LOG_MODE'] = 'MIXED'
 import datetime as dt
 import pandas as pd
 import threading as th
@@ -74,7 +73,7 @@ class FutuApi:
         """
         cols = ['Status', 'Strategy', 'ExecSet', 'Inventory', 'P / L', 'MaxCtrt', 'AvgPrice', 'TradedQty',
                 'Fees', 'Order', 'InitMargin']
-        logging.info(self.algo.strategies)
+        logging.error(self.algo.strategies)
         for i, strategy_name in enumerate(self.algo.strategies.keys()):
             logging.info(strategy_name)
             position, average_price, traded_qty, fees, pnl_value = self.cal_algo_data(trade_journal, strategy_name)

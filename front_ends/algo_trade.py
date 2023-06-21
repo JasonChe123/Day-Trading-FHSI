@@ -1,6 +1,7 @@
 import datetime as dt
-import pandas as pd
 import os
+from library.logging_ import config_logging
+# os.environ['KIVY_LOG_MODE'] = 'MIXED'
 
 from kivy.app import App
 from kivy.uix.button import Button
@@ -9,9 +10,6 @@ from kivy.uix.label import Label
 from kivy.uix.spinner import Spinner
 from kivy.uix.widget import Widget
 from KivyCalendar import DatePicker
-
-
-os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
 
 
 class Calendar(DatePicker):
@@ -158,3 +156,4 @@ class AlgoTrade(Widget):
         :return:
         """
         pass
+

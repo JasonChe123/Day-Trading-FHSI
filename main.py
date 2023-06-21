@@ -8,39 +8,15 @@ import threading as th
 from library.futu_api import FutuApi
 from library.ibapi import IBApi
 from library import programme
+from library.logging_ import config_logging
 from front_ends.algo_trade_main_page import AlgoTradeMainPage
 
 # GUI MODULES -------------------------------------------------------------------------------------
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.lang import Builder
-from kivy.logger import Logger
 from kivy.uix.carousel import Carousel
 from kivy.uix.popup import Popup
-
-
-class CustomFormatter(logging.Formatter):
-
-    grey = "\x1b[37m"
-    yellow = "\x1b[33m"
-    white = "\x1b[m"
-    red = "\x1b[31m"
-    black_yellow_bg = "\x1b[30;43m"
-    black_red_bg = "\x1b[30;41m"
-    formatter = lambda colour: f'%(asctime)s <%(name)s> {colour} [ %(levelname)-8s ] %(message)s \x1b[0m ("%(filename)s:%(lineno)s")'
-
-    FORMATS = {
-        logging.DEBUG: formatter(grey),
-        logging.INFO: formatter(white),
-        logging.WARNING: formatter(red),
-        logging.ERROR: formatter(black_yellow_bg),
-        logging.CRITICAL: formatter(black_red_bg),
-    }
-
-    def format(self, record):
-        log_fmt = self.FORMATS.get(record.levelno)
-        formatter = logging.Formatter(log_fmt, datefmt='%Y-%m-%d %H:%M:%S')
-        return formatter.format(record)
 
 
 class AlgoTradeForFHSI(App):
@@ -77,38 +53,8 @@ class AlgoTradeForFHSI(App):
         self.futu = FutuApi()
 
 
-def config_logging():
-    # set kivy loglevel
-    Logger.setLevel(logging.WARNING)
-
-    # set system loglevel
-    mylogger = logging.getLogger('root')
-    mylogger.setLevel(logging.DEBUG)  # todo: turn it to INFO while finish testing
-
-    # define log file path
-    file_name = 'demo.log' if IS_DEMO else 'live.log'
-    file_path = os.path.join(PROJECT_DIR, 'database', 'log', file_name)
-
-    # set handlers
-    file_handler = logging.FileHandler(file_path, encoding='utf-8')
-    stream_handler = logging.StreamHandler(sys.stdout)
-    stream_handler.setLevel(logging.DEBUG)  # todo: should be set to INFO, DEBUG is just for developing stage
-
-    # set formatter
-    file_formatter = logging.Formatter(
-        '%(asctime)s <%(name)s> [ %(levelname)-8s ] %(message)s "(%(filename)s:%(lineno)s)"',
-        datefmt='%Y-%m-%d %H:%M:%S'
-    )
-    stream_handler.setFormatter(CustomFormatter())
-    file_handler.setFormatter(file_formatter)
-
-    # add handler
-    mylogger.addHandler(file_handler)
-    mylogger.addHandler(stream_handler)
-
-
 if __name__ == '__main__':
-    os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
+    # os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
     PROJECT_DIR = os.getcwd()
     IS_DEMO = True
     IS_PRINT_TO_FILE = False
@@ -128,7 +74,7 @@ if __name__ == '__main__':
             RUNNING_STRATEGIES = argv.lstrip('strategy=').upper().split(',')
 
     # configure logging
-    config_logging()
+    config_logging(IS_DEMO, PROJECT_DIR)
 
     # launch futu-openD and tws
     th.Thread(target=programme.launch_futu_opend, args=[PROJECT_DIR], daemon=True).start()

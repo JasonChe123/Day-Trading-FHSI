@@ -1,9 +1,7 @@
 import os
+# os.environ['KIVY_LOG_MODE'] = 'MIXED'
 from kivy.app import App
 from kivy.uix.widget import Widget
-
-
-os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
 
 
 class Position(Widget):

@@ -1,5 +1,6 @@
 import datetime as dt
 import os
+# os.environ['KIVY_LOG_MODE'] = 'MIXED'
 
 from front_ends.algo_trade import AlgoTrade
 from front_ends.trade_journal import TradeJournal
@@ -9,9 +10,6 @@ from front_ends.position import Position
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.widget import Widget
-
-
-os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
 
 
 class AlgoTradeMainPage(Widget):
