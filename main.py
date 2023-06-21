@@ -58,7 +58,7 @@ class AlgoTradeForFHSI(App):
     def connect_brokers(self):
         self.futu = FutuApi()
         self.ibapi = IBApi()
-        self.futu.connect()
+        self.futu.connect(unlock_trade_password=FUTU_UNLOCK_TRADE_PASSWORD)
 
 
 if __name__ == '__main__':
@@ -67,6 +67,7 @@ if __name__ == '__main__':
     IS_DEMO = True
     IS_PRINT_TO_FILE = False
     RUNNING_STRATEGIES = []
+    FUTU_UNLOCK_TRADE_PASSWORD = 0
     IB_TWS_USER_NAME = ''
     IB_TWS_LOGIN_PWD = ''
 
@@ -74,12 +75,23 @@ if __name__ == '__main__':
     arguments = sys.argv[1:]  # the first argument is file name
     for argv in arguments:
         argv = argv.lower()
+        if 'futu_pwd=' in argv:
+            FUTU_UNLOCK_TRADE_PASSWORD = argv.lstrip('futu_pwd=')
+            print(FUTU_UNLOCK_TRADE_PASSWORD, type(FUTU_UNLOCK_TRADE_PASSWORD))
+            if not FUTU_UNLOCK_TRADE_PASSWORD.isnumeric():
+                print("Futu unlock trade password should be a number")
+                sys.exit()
+            FUTU_UNLOCK_TRADE_PASSWORD = int(FUTU_UNLOCK_TRADE_PASSWORD)
+
         if 'demo=' in argv and argv.lstrip('demo=') == 'false':
             IS_DEMO = False
-        if 'print_to_file=' in argv and argv.lower().lstrip('print_to_file=') == 'true':
-            IS_PRINT_TO_FILE = True
+
         if 'strategy=' in argv:
             RUNNING_STRATEGIES = argv.lstrip('strategy=').upper().split(',')
+    if FUTU_UNLOCK_TRADE_PASSWORD == 0:
+        print("Please input Futu Unlock Trade Password so as to function properly.")
+        print("\tfutu_pwd=123456")
+        sys.exit()
 
     # configure logging
     config_logging(IS_DEMO, PROJECT_DIR)
@@ -98,3 +110,7 @@ if __name__ == '__main__':
     Window.size = (450, 800)
     app = AlgoTradeForFHSI()
     app.run()
+
+    # close connection
+    app.futu.qot_ctx.close()
+    app.futu.trd_ctx.close()

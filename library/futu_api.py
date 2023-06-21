@@ -32,7 +32,7 @@ class FutuApi:
         self.contract_detail = {}  # to be set later
         self.timer = th.Timer(0, lambda: 0)
 
-    def connect(self) -> bool:
+    def connect(self, unlock_trade_password: int) -> bool:
         if is_running('FutuOpenD.exe'):
             # connect futu-api
             if not self.qot_ctx or not self.trd_ctx:
@@ -41,7 +41,7 @@ class FutuApi:
 
             if self.qot_ctx.status == self.trd_ctx.status == 'READY':
                 logging.debug("Quote context and trade context are ready.")
-                self.init_params()
+                self.init_params(unlock_trade_password)
             else:
                 self.timer = th.Timer(10.0, self.connect)
                 self.timer.start()
@@ -49,13 +49,27 @@ class FutuApi:
             self.timer = th.Timer(10.0, self.connect)
             self.timer.start()
 
-    def init_params(self):
+    def init_params(self, unlock_trade_password):
         result = self.set_contract_info()
         if not result:  # sometime "此数据暂时还未准备好"
-            self.timer = th.Timer(10.0, self.connect)
+            self.timer = th.Timer(10.0, self.init_params)
             self.timer.start()
             return
 
+        # subscribe orderbook data, used for demo trade
+        ret_code, err_msg = self.qot_ctx.subscribe(self.contract_detail.get('full_code'),
+                                                   ft.SubType.ORDER_BOOK,
+                                                   is_first_push=False,
+                                                   subscribe_push=False)
+        if ret_code != ft.RET_OK:
+            logging.error(err_msg)
+
+        # unlock trade
+        ret_code, ret_data = self.trd_ctx.unlock_trade(password=unlock_trade_password)
+        if ret_code != ft.RET_OK:
+            logging.error(ret_data)
+
+        #
 
     def set_contract_info(self) -> bool:
         year, month = get_contract_year_and_month()
