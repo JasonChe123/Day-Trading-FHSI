@@ -1,8 +1,8 @@
 import datetime as dt
 import os
 from library.logging_ import config_logging
-# os.environ['KIVY_LOG_MODE'] = 'MIXED'
 
+os.environ['KIVY_LOG_MODE'] = 'MIXED'
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.checkbox import CheckBox

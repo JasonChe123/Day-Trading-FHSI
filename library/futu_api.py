@@ -1,11 +1,11 @@
 import logging
 import os
-os.environ['KIVY_LOG_MODE'] = 'MIXED'
 import datetime as dt
 import pandas as pd
 import threading as th
 import uuid
 
+os.environ['KIVY_LOG_MODE'] = 'MIXED'
 from kivy.app import App
 from kivy.clock import Clock
 

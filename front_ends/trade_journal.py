@@ -1,6 +1,7 @@
 import datetime as dt
 import os
-# os.environ['KIVY_LOG_MODE'] = 'MIXED'
+
+os.environ['KIVY_LOG_MODE'] = 'MIXED'
 from kivy.app import App
 from kivy.uix.widget import Widget
 from KivyCalendar import DatePicker

@@ -1,7 +1,7 @@
 import datetime as dt
 import os
-# os.environ['KIVY_LOG_MODE'] = 'MIXED'
 
+os.environ['KIVY_LOG_MODE'] = 'MIXED'
 from front_ends.algo_trade import AlgoTrade
 from front_ends.trade_journal import TradeJournal
 from front_ends.account_info import AccountInfo
