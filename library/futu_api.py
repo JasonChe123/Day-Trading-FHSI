@@ -15,6 +15,21 @@ from kivy.app import App
 from kivy.clock import Clock
 
 
+class SysNotificationHandler(ft.SysNotifyHandlerBase):
+    def on_recv_rsp(self, rsp_str):
+        ret_code, data = super(SysNotificationHandler, self).on_recv_rsp(rsp_str)
+
+
+class TradeOrderHandler(ft.TradeOrderHandlerBase):
+    def on_recv_rsp(self, rsp_pb):
+        ret_code, ret_data = super(TradeOrderHandler, self).on_recv_rsp(rsp_pb)
+
+
+class TradeDealHandler(ft.TradeDealHandlerBase):
+    def on_recv_rsp(self, rsp_pb):
+        ret_code, ret_data = super(TradeDealHandler, self).on_recv_rsp(rsp_pb)
+
+
 class FutuApi:
     def __init__(self):
         self.main_app = App.get_running_app()
@@ -69,7 +84,13 @@ class FutuApi:
         if ret_code != ft.RET_OK:
             logging.error(ret_data)
 
-        #
+        # set handlers
+        notification_handler = SysNotificationHandler()
+        trade_order_handler = TradeOrderHandler()
+        trade_deal_handler = TradeDealHandler()
+        self.qot_ctx.set_handler(notification_handler)
+        self.trd_ctx.set_handler(trade_order_handler)
+        self.trd_ctx.set_handler(trade_deal_handler)
 
     def set_contract_info(self) -> bool:
         year, month = get_contract_year_and_month()
