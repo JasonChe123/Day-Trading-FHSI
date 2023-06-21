@@ -43,6 +43,7 @@ class AlgoTradeForFHSI(App):
 
     def on_start(self):
         self.connect_brokers()
+        self.algo_main_page.algo_trade.load_strategies()
 
     def on_stop(self):
         self.futu.close_all_connection()

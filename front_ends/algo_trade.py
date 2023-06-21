@@ -156,4 +156,3 @@ class AlgoTrade(Widget):
         :return:
         """
         pass
-
