@@ -5,6 +5,7 @@ import pandas as pd
 import threading as th
 import uuid
 
+from library.contract_info import get_contract_year_and_month
 from library.programme import is_running
 
 import futu as ft
@@ -38,12 +39,27 @@ class FutuApi:
                 self.qot_ctx = ft.OpenQuoteContext()
                 self.trd_ctx = ft.OpenFutureTradeContext()
 
-            if self.trd_ctx.status == 'REDAY':
+            if self.trd_ctx.status == 'READY':
                 # set contract info
                 result = self.set_contract_info()
 
     def set_contract_info(self) -> bool:
-        pass
+        year, month = get_contract_year_and_month()
+
+        # get margin requirement
+        ret_code, ret_data = self.trd_ctx.acctradinginfo_query('MARKET', 'HK.MHImain', 0)
+        if ret_code != ft.RET_OK:
+            logging.warning(ret_data)
+            return False
+        margin = round(ret_data['long_required_im'][0], -3) + 1000
+
+        # set contract detail
+        self.contract_detail = {
+            'full_code': ''.join(['HK.MHI', year, month]),
+            'pt_val': 10,
+            'margin': margin
+        }
+        return True
 
     # ------------------------------------------------------------------------------------------- #
     """ database operation """
