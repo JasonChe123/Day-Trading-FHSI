@@ -43,9 +43,13 @@ def get_contract_year_and_month() -> (str, str):
     next_month = 1 if current_month == 12 else current_month + 1
     contract_year = str(dt.date.today().year)[-2:]
     contract_month = str(current_month).zfill(2)
+
+    # check if today is 4 days earlier from the end
     if dt.date.today().day >= get_last_trading_day_in_this_month(4):
         contract_month = str(next_month).zfill(2)
-    if current_month == 12 and int(contract_month) == 1:
-        contract_year = str(dt.date.today().year + 1)[-2:]
+
+        # check if today is the last month
+        if current_month == 12 and int(contract_month) == 1:
+            contract_year = str(dt.date.today().year + 1)[-2:]
 
     return contract_year, contract_month
