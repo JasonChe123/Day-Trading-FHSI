@@ -12,7 +12,6 @@ import futu as ft
 
 os.environ['KIVY_LOG_MODE'] = 'MIXED'
 from kivy.app import App
-from kivy.clock import Clock
 
 
 class SysNotificationHandler(ft.SysNotifyHandlerBase):

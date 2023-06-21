@@ -13,6 +13,7 @@ from front_ends.algo_trade_main_page import AlgoTradeMainPage
 
 # GUI MODULES -------------------------------------------------------------------------------------
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.lang import Builder
 from kivy.uix.carousel import Carousel
@@ -59,6 +60,7 @@ class AlgoTradeForFHSI(App):
         self.futu = FutuApi()
         self.ibapi = IBApi()
         self.futu.connect(unlock_trade_password=FUTU_UNLOCK_TRADE_PASSWORD)
+        Clock.schedule_once(self.ibapi.init_connection, 60)
 
 
 if __name__ == '__main__':
@@ -77,20 +79,32 @@ if __name__ == '__main__':
         argv = argv.lower()
         if 'futu_pwd=' in argv:
             FUTU_UNLOCK_TRADE_PASSWORD = argv.lstrip('futu_pwd=')
-            print(FUTU_UNLOCK_TRADE_PASSWORD, type(FUTU_UNLOCK_TRADE_PASSWORD))
             if not FUTU_UNLOCK_TRADE_PASSWORD.isnumeric():
                 print("Futu unlock trade password should be a number")
                 sys.exit()
             FUTU_UNLOCK_TRADE_PASSWORD = int(FUTU_UNLOCK_TRADE_PASSWORD)
+
+        if 'ib_user_name=' in argv:
+            IB_TWS_USER_NAME = argv.lstrip('ib_user_name=')
+
+        if 'ib_pwd=' in argv:
+            IB_TWS_LOGIN_PWD = argv.lstrip('ib_pwd=')
 
         if 'demo=' in argv and argv.lstrip('demo=') == 'false':
             IS_DEMO = False
 
         if 'strategy=' in argv:
             RUNNING_STRATEGIES = argv.lstrip('strategy=').upper().split(',')
+
+    # check login input
     if FUTU_UNLOCK_TRADE_PASSWORD == 0:
         print("Please input Futu Unlock Trade Password so as to function properly.")
         print("\tfutu_pwd=123456")
+        sys.exit()
+    if IB_TWS_USER_NAME == '' or IB_TWS_LOGIN_PWD == '':
+        print("Please input TWS login name and password so as to function properly.")
+        print("\tib_user_name=abcdefg")
+        print("\tib_pwd=abcdefg")
         sys.exit()
 
     # configure logging
