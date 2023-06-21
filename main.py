@@ -1,7 +1,5 @@
 # SYSTEM MODULES ----------------------------------------------------------------------------------
 import logging
-from pathlib import Path
-import re
 import os
 import sys
 import threading as th
@@ -13,16 +11,11 @@ from library import programme
 from front_ends.algo_trade_main_page import AlgoTradeMainPage
 
 # GUI MODULES -------------------------------------------------------------------------------------
-os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
-import kivy
 from kivy.app import App
-from kivy.clock import Clock
-from kivy.config import Config
 from kivy.core.window import Window
 from kivy.lang import Builder
 from kivy.logger import Logger
 from kivy.uix.carousel import Carousel
-from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 
 
@@ -115,6 +108,7 @@ def config_logging():
 
 
 if __name__ == '__main__':
+    os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
     PROJECT_DIR = os.getcwd()
     IS_DEMO = True
     IS_PRINT_TO_FILE = False

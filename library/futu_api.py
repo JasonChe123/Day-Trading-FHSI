@@ -38,7 +38,7 @@ class FutuApi:
     def get_trade_journal(self) -> pd.DataFrame:
         if self.main_app.is_demo:
             if os.path.isfile(self.trade_journal_file_path):
-                logging.debug("read csv")
+                logging.debug(f"read {self.trade_journal_file_path}")
                 return pd.read_csv(self.trade_journal_file_path)
             else:
                 return pd.DataFrame()
@@ -49,12 +49,12 @@ class FutuApi:
     """ update gui """
     # ------------------------------------------------------------------------------------------- #
     def init_gui(self, start_date: dt.date, end_date: dt.date):
-        logging.info("init gui")
         trade_journal = self.get_trade_journal()
         if trade_journal.empty:
             return
 
         trade_jounal = self.filter_trade_journal(trade_journal, start_date, end_date)
+        algo_table = self.get_algo_table(trade_journal)
 
     def refresh_algo_trade(self, trade_journal):
         algo_table = self.get_algo_table(trade_journal)
@@ -72,4 +72,12 @@ class FutuApi:
         """
         convert trade journal to algo table
         """
+        cols = ['Status', 'Strategy', 'ExecSet', 'Inventory', 'P / L', 'MaxCtrt', 'AvgPrice', 'TradedQty',
+                'Fees', 'Order', 'InitMargin']
+        logging.info(self.algo.strategies)
+        for i, strategy_name in enumerate(self.algo.strategies.keys()):
+            logging.info(strategy_name)
+            position, average_price, traded_qty, fees, pnl_value = self.cal_algo_data(trade_journal, strategy_name)
+
+    def cal_algo_data(self, trade_journal: pd.DataFrame, strategy_name: str) -> (int, int, int, int, int):
         pass

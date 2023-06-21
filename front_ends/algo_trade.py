@@ -2,7 +2,6 @@ import datetime as dt
 import pandas as pd
 import os
 
-os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.checkbox import CheckBox
@@ -10,6 +9,9 @@ from kivy.uix.label import Label
 from kivy.uix.spinner import Spinner
 from kivy.uix.widget import Widget
 from KivyCalendar import DatePicker
+
+
+os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
 
 
 class Calendar(DatePicker):

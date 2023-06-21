@@ -1,8 +1,8 @@
-database/log/
-database/trade_journal/
+database/log/*
+database/trade_journal/*
 front_ends/__pycache__/
 library/__pycache__/
-futu_openD/
+futu_openD/*
 venv/
 __pycache__/
 .git/
