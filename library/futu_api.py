@@ -32,16 +32,30 @@ class FutuApi:
         self.contract_detail = {}  # to be set later
         self.timer = th.Timer(0, lambda: 0)
 
-    def connect(self):
+    def connect(self) -> bool:
         if is_running('FutuOpenD.exe'):
             # connect futu-api
             if not self.qot_ctx or not self.trd_ctx:
                 self.qot_ctx = ft.OpenQuoteContext()
                 self.trd_ctx = ft.OpenFutureTradeContext()
 
-            if self.trd_ctx.status == 'READY':
-                # set contract info
-                result = self.set_contract_info()
+            if self.qot_ctx.status == self.trd_ctx.status == 'READY':
+                logging.debug("Quote context and trade context are ready.")
+                self.init_params()
+            else:
+                self.timer = th.Timer(10.0, self.connect)
+                self.timer.start()
+        else:
+            self.timer = th.Timer(10.0, self.connect)
+            self.timer.start()
+
+    def init_params(self):
+        result = self.set_contract_info()
+        if not result:  # sometime "此数据暂时还未准备好"
+            self.timer = th.Timer(10.0, self.connect)
+            self.timer.start()
+            return
+
 
     def set_contract_info(self) -> bool:
         year, month = get_contract_year_and_month()
