@@ -60,10 +60,10 @@ class FutuApi:
                 logging.debug("Quote context and trade context are ready.")
                 self.init_params(unlock_trade_password)
             else:
-                self.timer = th.Timer(10.0, self.connect)
+                self.timer = th.Timer(10.0, lambda: self.connect(unlock_trade_password))
                 self.timer.start()
         else:
-            self.timer = th.Timer(10.0, self.connect)
+            self.timer = th.Timer(10.0, lambda: self.connect(unlock_trade_password))
             self.timer.start()
 
     def close_all_connection(self):
