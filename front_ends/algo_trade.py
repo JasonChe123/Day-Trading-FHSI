@@ -174,3 +174,5 @@ class AlgoTrade(Widget):
                 # import all classes as strategies
                 for class_ in inspect.getmembers(module, inspect.isclass):  # [(class_name, class_instance), ...]
                     self.__setattr__('strategy_' + class_[1].name.lower(), class_[1])
+                    # assign strategy to dictionary
+                    self.strategies[class_[1].name] = self.__getattribute__('strategy_' + class_[1].name.lower())

@@ -37,7 +37,7 @@ class TradeJournal(Widget):
 
     # update gui ----------------------------------------------------------------------------------
     def init_filter(self):
-        pass
+        self.ids['filter'].values = ['ALL'] + list(self.algo.strategies.keys())
 
     def update_date(self, start_or_end: str):
         """
