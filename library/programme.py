@@ -22,7 +22,7 @@ def launch_futu_opend(project_dir):
         logging.debug(f"{programme_name} is already run.")
     else:
         logging.debug(f"Launch Futu-OpenD.")
-        os.system(programme_path) if operation_system == 'linux' else os.startfile(programme_path)
+        os.system(os.path.splitext(programme_path)[0]) if operation_system == 'linux' else os.startfile(programme_path)
 
 
 def launch_tws(project_dir, user_name: str, password: str):

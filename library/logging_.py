@@ -12,7 +12,7 @@ class CustomFormatter(logging.Formatter):
     red = "\x1b[31m"
     black_yellow_bg = "\x1b[30;43m"
     black_red_bg = "\x1b[30;41m"
-    formatter = lambda colour: f'%(asctime)s <%(name)s> {colour} [ %(levelname)-8s ] %(message)s \x1b[0m ("%(filename)s:%(lineno)s")'
+    formatter = lambda colour: f'%(asctime)s <%(name)-20s> {colour} [ %(levelname)-8s ] %(message)s \x1b[0m ("%(filename)s:%(lineno)s")'
 
     FORMATS = {
         logging.DEBUG: formatter(grey),
@@ -36,7 +36,7 @@ def config_logging(is_demo: bool, proj_dir: os.path):
 
     # set system loglevel
     mylogger = logging.getLogger('root')
-    mylogger.setLevel(logging.WARNING)  # todo: turn it to INFO while finish testing
+    mylogger.setLevel(logging.INFO)  # todo: turn it to INFO while finish testing
 
     # define log file path
     file_name = 'demo.log' if is_demo else 'live.log'
