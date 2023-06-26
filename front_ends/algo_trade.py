@@ -1,6 +1,8 @@
 import datetime as dt
+import importlib.util
+import inspect
+import logging
 import os
-from library.logging_ import config_logging
 
 os.environ['KIVY_LOG_MODE'] = 'MIXED'
 from kivy.app import App
@@ -152,7 +154,23 @@ class AlgoTrade(Widget):
     # helper methods ------------------------------------------------------------------------------
     def load_strategies(self):
         """
-        to be loaded after all gui has been built (the 'on_start' method from the 'App')
+        Load strategies after all gui had been built (the 'on_start' method from the 'App').
         :return:
         """
-        pass
+        # get all files in algorithm
+        strategy_file_names = os.listdir(os.path.join(self.main_app.proj_dir, 'algorithm'))
+
+        # check if 'ready' in file name
+        for file_name in strategy_file_names:
+            if 'ready' in file_name:
+                # import module from file
+                spec = importlib.util.spec_from_file_location(
+                    os.path.splitext(file_name)[0],
+                    os.path.join(self.main_app.proj_dir, 'algorithm', file_name)
+                )
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+
+                # import all classes as strategies
+                for class_ in inspect.getmembers(module, inspect.isclass):  # [(class_name, class_instance), ...]
+                    self.__setattr__('strategy_' + class_[1].name.lower(), class_[1])

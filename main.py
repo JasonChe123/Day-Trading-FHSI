@@ -125,3 +125,5 @@ if __name__ == '__main__':
     Window.size = (450, 800)
     app = AlgoTradeForFHSI()
     app.run()
+
+    # todo: kill futu_open_d
