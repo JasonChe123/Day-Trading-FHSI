@@ -137,7 +137,6 @@ class FutuApi:
         """
         if trade_journal.empty:
             trade_journal = self.filter_trade_journal(self.get_trade_journal(), start_date, end_date)
-            logging.critical(trade_journal)
 
         return trade_journal
 

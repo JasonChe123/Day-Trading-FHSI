@@ -161,4 +161,4 @@ class TradeJournal(Widget):
         self.main_app.popup.dismiss()
 
     def update_filter(self, instance=None):
-        pass
+        self.refresh()
