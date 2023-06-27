@@ -12,6 +12,7 @@ import futu as ft
 
 os.environ['KIVY_LOG_MODE'] = 'MIXED'
 from kivy.app import App
+from kivy.clock import Clock
 
 
 class SysNotificationHandler(ft.SysNotifyHandlerBase):
@@ -55,7 +56,6 @@ class FutuApi:
             if not self.qot_ctx or not self.trd_ctx:
                 self.qot_ctx = ft.OpenQuoteContext()
                 self.trd_ctx = ft.OpenFutureTradeContext()
-
             if self.qot_ctx.status == self.trd_ctx.status == 'READY':
                 logging.debug("Quote context and trade context are ready.")
                 self.init_params(unlock_trade_password)
@@ -130,6 +130,16 @@ class FutuApi:
                 return pd.DataFrame()
         else:
             pass
+
+    def refresh_trade_journal(self, start_date: dt.date, end_date: dt.date, trade_journal: pd.DataFrame = pd.DataFrame()):
+        """
+        Callback from trade_journal 'refresh' button
+        """
+        if trade_journal.empty:
+            trade_journal = self.filter_trade_journal(self.get_trade_journal(), start_date, end_date)
+            logging.critical(trade_journal)
+
+        return trade_journal
 
     # ------------------------------------------------------------------------------------------- #
     """ update gui """
