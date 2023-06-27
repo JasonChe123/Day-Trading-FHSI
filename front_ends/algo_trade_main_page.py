@@ -49,7 +49,7 @@ class AlgoTradeMainPage(Widget):
                 self.account_info.update_data()
             elif page.id == slide == 'position':
                 # update data
-                pass
+                self.position.update_data()
 
     def update_clock(self):
         # get label by 'id' in kv file
