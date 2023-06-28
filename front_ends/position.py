@@ -49,12 +49,12 @@ class Position(Widget):
                 [data, data.loc[data['code'].str[3:6] == 'MHI'].sum(numeric_only=True).to_frame().T],
                 ignore_index=True
             )
-            # set cell value
+            # set code and stock_name
             data.loc[data.index[-1], 'code'] = data.at[0, 'code']
             data.loc[data.index[-1], 'stock_name'] = data.at[0, 'stock_name']
 
             # get the last row (the grouped and sum row)
-            data = data.tail(1).reset_index()
+            data = data.tail(1).reset_index(drop=True)
 
         # add widgets
         for header in data.columns:
