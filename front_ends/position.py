@@ -80,4 +80,10 @@ class Position(Widget):
             button = Button(text=str(value), halign='left', valign='center',
                             size=(100, row_height), size_hint=(None, None),
                             color=color, background_normal='', background_down='', background_color=(0, 0, 0, 0))
+            button.text_size = button.size
+
+            # set chinese font
+            if header == 'stock_name':
+                button.font_name = os.path.join(self.project_directory, 'library', 'fonts', 'Source Han Sans CN Light.otf')
+
             self.ids['position_table'].add_widget(button)

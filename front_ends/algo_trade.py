@@ -4,6 +4,8 @@ import inspect
 import logging
 import os
 
+import pandas as pd
+
 os.environ['KIVY_LOG_MODE'] = 'MIXED'
 from kivy.app import App
 from kivy.uix.button import Button
@@ -70,12 +72,13 @@ class AlgoTrade(Widget):
             self.end_date = dt.datetime.strptime(self.calendar.text, '%d.%m.%Y')
             self.ids['label_date_to'].text = dt.datetime.strftime(self.end_date, '%d-%b-%y')
 
-    def update_table(self, df):
+    def update_table(self):
         """
         update algo table while
             1. app launch
             2. futu-api TradeDealHandler callback
-        :param df: dataframe format:
+
+        :param data: dataframe format:
                 Status  Strategy    ExecSet Inventory   P / L   MaxCtrt AvgPrice    TradeQty    Fees    Order   InitMargin
             0   MAL                                                                                     PlsSelect
             1   SWL                                                                                     PlsSelect
@@ -85,6 +88,9 @@ class AlgoTrade(Widget):
         self.main_app.popup.dismiss()
 
         if not self.strategies:
+            return
+        else:
+            logging.critical(self.strategies)
             return
 
         self.table = df.copy()
@@ -131,25 +137,25 @@ class AlgoTrade(Widget):
 
     # buttons' callback ---------------------------------------------------------------------------
     def start_all(self, instance=None):
-        print("start all")
+        logging.critical("start all")
 
     def stop_all(self, instance=None):
-        print("stop all")
+        logging.critical("stop all")
 
     def cover_all(self, instance=None):
-        print("cover all")
+        logging.critical("cover all")
 
     def refresh(self, instance=None):
-        print("refresh", self.start_date, self.end_date)
+        logging.critical(f"refresh {self.start_date} {self.end_date}")
 
     def update_auto_shutdown(self, instance=None):
-        print("update auto shutdown", instance.active)
+        logging.critical(f"update auto shutdown {instance.active}")
 
-    def set_on_off_algo(self):
-        print("set on/off algo")
+    def set_on_off_algo(self, instance=None):
+        logging.critical("set on/off algo")
 
     def manual_order(self, strategy_name: str, operation: str, instance=None):
-        print("manual order")
+        logging.critical(f"manual order {strategy_name} {operation}")
 
     # helper methods ------------------------------------------------------------------------------
     def load_strategies(self):
@@ -160,7 +166,7 @@ class AlgoTrade(Widget):
         # get all files in algorithm
         strategy_file_names = os.listdir(os.path.join(self.main_app.proj_dir, 'algorithm'))
 
-        # check if 'ready' in file name
+        # check if 'ready' in strategy_file_names
         for file_name in strategy_file_names:
             if 'ready' in file_name:
                 # import module from file

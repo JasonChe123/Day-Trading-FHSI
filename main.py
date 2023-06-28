@@ -1,4 +1,5 @@
 # SYSTEM MODULES ----------------------------------------------------------------------------------
+from collections import defaultdict
 import logging
 import os
 import sys
@@ -39,11 +40,13 @@ class AlgoTradeForFHSI(App):
         self.algo_main_page = AlgoTradeMainPage()
         self.algo_main_page.create_pages()
         self.carousel.add_widget(self.algo_main_page)
+
         return self.carousel
 
     def on_start(self):
         self.connect_brokers()
         self.algo_main_page.algo_trade.load_strategies()
+        self.algo_main_page.algo_trade.update_table()
         self.algo_main_page.trade_journal.init_filter()
         self.algo_main_page.trade_journal.refresh()
 
@@ -67,48 +70,51 @@ class AlgoTradeForFHSI(App):
         self.ibapi.init_connection()
 
 
+def get_system_arguments():
+    # get system arguments
+    sys_params = dict()
+    for key, value in ((key.lstrip('-'), value) for key, value, in (a.split('=') for a in sys.argv[1:])):
+        sys_params[key] = value
+
+    # update required arguments
+    required_params = {
+        'futu_pwd': '0',
+        'ib_username': '',
+        'ib_pwd': '',
+        'demo': 'true',
+        'strategy': '',
+    }
+    required_params.update(sys_params)
+
+    # check validity
+    if required_params['futu_pwd'] == 0:
+        raise Exception("Please input 'futu_pwd'=******.")
+
+    if not required_params['futu_pwd'].isnumeric():
+        raise Exception("futu_pwd should be numeric.")
+
+    if not required_params['ib_username']:
+        raise Exception("Please input 'ib_username=******.")
+
+    if not required_params['ib_pwd']:
+        raise Exception("Please input 'ib_pwd=******")
+
+    if required_params['demo'].lower() not in ['true', 'false']:
+        raise Exception("Please input true/false for 'demo' parameter.")
+
+    return required_params
+
+
 if __name__ == '__main__':
     PROJECT_DIR = os.getcwd()
-    IS_DEMO = True
-    IS_PRINT_TO_FILE = False
-    RUNNING_STRATEGIES = []
-    FUTU_UNLOCK_TRADE_PASSWORD = 0
-    IB_TWS_USER_NAME = ''
-    IB_TWS_LOGIN_PWD = ''
+    sys_params = get_system_arguments()
 
-    # check system arguments
-    arguments = sys.argv[1:]  # the first argument is file name
-    for argv in arguments:
-        argv = argv.lower()
-        if 'futu_pwd=' in argv:
-            FUTU_UNLOCK_TRADE_PASSWORD = argv.lstrip('futu_pwd=')
-            if not FUTU_UNLOCK_TRADE_PASSWORD.isnumeric():
-                print("Futu unlock trade password should be a number")
-                sys.exit()
-            FUTU_UNLOCK_TRADE_PASSWORD = int(FUTU_UNLOCK_TRADE_PASSWORD)
-
-        if 'ib_user_name=' in argv:
-            IB_TWS_USER_NAME = argv.lstrip('ib_user_name=')
-
-        if 'ib_pwd=' in argv:
-            IB_TWS_LOGIN_PWD = argv.lstrip('ib_pwd=')
-
-        if 'demo=' in argv and argv.lstrip('demo=') == 'false':
-            IS_DEMO = False
-
-        if 'strategy=' in argv:
-            RUNNING_STRATEGIES = argv.lstrip('strategy=').upper().split(',')
-
-    # check login input
-    if FUTU_UNLOCK_TRADE_PASSWORD == 0:
-        print("Please input Futu Unlock Trade Password so as to function properly.")
-        print("\tfutu_pwd=123456")
-        sys.exit()
-    if IB_TWS_USER_NAME == '' or IB_TWS_LOGIN_PWD == '':
-        print("Please input TWS login name and password so as to function properly.")
-        print("\tib_user_name=abcdefg")
-        print("\tib_pwd=abcdefg")
-        sys.exit()
+    # set system params
+    FUTU_UNLOCK_TRADE_PASSWORD = int(sys_params['futu_pwd'])
+    IB_TWS_USER_NAME = sys_params['ib_username']
+    IB_TWS_LOGIN_PWD = sys_params['ib_pwd']
+    IS_DEMO = True if sys_params['demo'].lower() == 'true' else False
+    RUNNING_STRATEGIES = sys_params['strategy'].split(',')
 
     # configure logging
     config_logging(IS_DEMO, PROJECT_DIR)
