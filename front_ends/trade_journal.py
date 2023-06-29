@@ -40,7 +40,9 @@ class TradeJournal(Widget):
         self.ids['label_date_from'].text = dt.datetime.strftime(self.start_date, '%d-%b-%y')
         self.ids['label_date_to'].text = dt.datetime.strftime(self.end_date, '%d-%b-%y')
 
-    # update gui ----------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------- #
+    """ update gui """
+    # ------------------------------------------------------------------------------------------- #
     def init_filter(self):
         self.ids['filter'].values = ['ALL'] + list(self.algo.strategies.keys())
 
@@ -147,7 +149,9 @@ class TradeJournal(Widget):
         # fill up the space
         self.ids['data_table'].add_widget(Widget())
 
-    # buttons' callback ---------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------- #
+    """ button's callback """
+    # ------------------------------------------------------------------------------------------- #
     def show_calendar(self, start_or_end: str):
         self.calendar.show_popup(1, 0.5)
         self.calendar.update = start_or_end

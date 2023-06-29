@@ -196,8 +196,30 @@ class AlgoTrade(Widget):
     def set_on_off_algo(self, instance=None):
         logging.critical("set on/off algo")
 
-    def manual_order(self, instance, strategy_name: str='', operation: str='',):
-        logging.critical(f"manual order {strategy_name} {operation}")
+    def manual_order(self, instance=None, strategy_name: str='', operation: str='',):
+        """
+        callback from order spinner in algo_trade
+        """
+        # check strategy
+        strategy = self.strategies.get(instance.ids['Strategy']) if not strategy_name else self.strategies.get(strategy_name)
+        operation = instance.text if instance else operation
+
+        match operation:
+            case 'Buy' | 'Sell':
+                qty = strategy.exec_set
+                side = operation.upper()
+                remark = 'LE(MAN)' if side == 'BUY' else 'SE(MAN)'
+            case 'Cover':
+                qty = abs(strategy.inv_algo)
+                if not qty:
+                    logging.critical("Nothing to be covered.")
+                    return
+                side = 'SELL' if strategy.inv_algo > 0 else 'BUY'
+                remark = 'MANUAL COVER'
+            case _:
+                return
+
+        self.main_app.futu.fire_trade(side=side, qty=qty, remark=remark)
 
     # ------------------------------------------------------------------------------------------- #
     """ helper methods """

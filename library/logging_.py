@@ -49,7 +49,7 @@ def config_logging(is_demo: bool, proj_dir: os.path):
 
     # set formatter
     file_formatter = logging.Formatter(
-        '%(asctime)s <%(name)s> [ %(levelname)-8s ] %(message)s "(%(filename)s:%(lineno)s)"',
+        '%(asctime)s <%(name)-20s> [ %(levelname)-8s ] %(message)s "(%(filename)s:%(lineno)s)"',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     stream_handler.setFormatter(CustomFormatter())

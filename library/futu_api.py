@@ -100,6 +100,53 @@ class FutuApi:
         self.trd_ctx.set_handler(trade_order_handler)
         self.trd_ctx.set_handler(trade_deal_handler)
 
+    # ------------------------------------------------------------------------------------------- #
+    """ trading operation """
+    # ------------------------------------------------------------------------------------------- #
+    def fire_trade(self, side: str, qty: int, remark: str, order_type='MARKET'):
+        if not self.qot_ctx or not self.trd_ctx:
+            logging.critical("Futu OpenD connection is not ready, please try again later.")
+            return
+
+        def demo_order():
+            logging.critical(f"Demo order: side={side} qty={qty} remark={remark}")
+
+            # get market data (orderbook)
+            ret_code, ret_data = self.qot_ctx.get_order_book(self.contract_detail.get('full_code'), 1)
+            if ret_code != ft.RET_OK:
+                logging.warning(ret_data)
+                return
+            bid_price, ask_price = ret_data['Bid'][0][0], ret_data['Ask'][0][0]
+
+            # set trading params
+            exec_price = bid_price if side == 'SELL' else ask_price
+            create_time = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            # update order history and deal history
+            self.update_demo_order_history(create_time, side, qty, exec_price, remark, order_type)
+            self.update_demo_trade_deal_history()
+
+            # for separate order
+            if separate_qty:
+                th.Timer(interval=0.5, function=self.fire_trade,
+                         args=[side, separate_qty, remark + '(separate order)', order_type]).start()
+
+        def real_order():
+            logging.critical("Place read order.")
+
+        # check if separate order needed
+        total_inv = abs(sum([strategy.inv_real for strategy in self.algo.strategies.values()]))
+        separate_qty = 0
+        if total_inv > 0 and side == 'SELL' or total_inv < 0 and side == 'BUY':
+            if qty > abs(total_inv):
+                separate_qty, qty = qty - total_inv, total_inv
+
+        # place order
+        demo_order() if self.main_app.is_demo else real_order()
+
+    # ------------------------------------------------------------------------------------------- #
+    """ database operation """
+    # ------------------------------------------------------------------------------------------- #
     def set_contract_info(self) -> bool:
         year, month = get_contract_year_and_month()
 
@@ -118,9 +165,6 @@ class FutuApi:
         }
         return True
 
-    # ------------------------------------------------------------------------------------------- #
-    """ database operation """
-    # ------------------------------------------------------------------------------------------- #
     def get_trade_journal(self) -> pd.DataFrame:
         if self.main_app.is_demo:
             if os.path.isfile(self.trade_journal_file_path):
@@ -139,6 +183,14 @@ class FutuApi:
             trade_journal = self.filter_trade_journal(self.get_trade_journal(), start_date, end_date)
 
         return trade_journal
+
+    def update_demo_order_history(self, create_time: str, trd_side: str, qty: int, price: int,
+                                  remark: str, order_type: str):
+        ret_code, ret_data = self.trd_ctx.history_order_list_query()
+        columns = ret_data.columns
+
+    def update_demo_trade_deal_history(self):
+        pass
 
     # ------------------------------------------------------------------------------------------- #
     """ algo related """
