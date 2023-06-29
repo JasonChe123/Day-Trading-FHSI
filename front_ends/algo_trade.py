@@ -59,7 +59,9 @@ class AlgoTrade(Widget):
         self.ids['label_date_from'].text = dt.datetime.strftime(self.start_date, '%d-%b-%y')
         self.ids['label_date_to'].text = dt.datetime.strftime(self.end_date, '%d-%b-%y')
 
-    # update gui ----------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------- #
+    """ update gui """
+    # ------------------------------------------------------------------------------------------- #
     def show_calendar(self, start_or_end: str):
         self.calendar.show_popup(1, 0.5)
         self.calendar.update = start_or_end
@@ -87,55 +89,95 @@ class AlgoTrade(Widget):
         """
         self.main_app.popup.dismiss()
 
+        # do nothing if no any running strategies
         if not self.strategies:
             return
-        else:
-            logging.critical(self.strategies)
-            return
 
-        self.table = df.copy()
+        # setup self.table in DataFrame format
+        self.table = self.main_app.futu.get_algo_table(self.strategies.keys(), self.start_date, self.end_date)
 
-        # initialize table
+        # initialize table (gui)
         self.ids['data_table'].clear_widgets()
         col_width, row_height = 80, 30
         self.ids['data_table'].cols = len(self.table.columns) + 1  # include column for 'on/off' checkbutton
-        self.ids['data_table'].add_widget(Widget(size=(22, row_height), size_hint=(None, None)))
 
         # add headers
+        self.ids['data_table'].add_widget(Widget(size=(22, row_height), size_hint=(None, None)))  # on/off column
         for header in self.table.columns:
             self.ids['data_table'].add_widget(
-                Button(text=header,
-                       size=(col_width, row_height),
-                       size_hint=(None, None),
-                       background_normal='',
-                       background_down='',
-                       background_color=self.color_map.get('grey')
-                       )
+                Button(text=header, size=(col_width, row_height), size_hint=(None, None),
+                       background_normal='', background_down='', background_color=self.color_map.get('grey'))
             )
 
         # add rows
-        max_contract_total = initial_margin_total = 0
-        for index, row in self.table.iterrows():
-            # add 'on/off' checkbutton
+        def add_check_button():
             checkbox = CheckBox(active=True, size=(20, row_height), size_hint=(None, None))
             checkbox.bind(on_press=lambda cb: self.set_on_off_algo(cb))
             self.ids['data_table'].ids[row['Strategy'] + '_OnOff'] = checkbox  # set id to checkbox, e.g. MAL_OnOff
             self.ids['data_table'].add_widget(checkbox)
 
-            # add other widgets inside the table
+        def add_order_spinner(row):
+            order = OrderSpinner()
+            order.ids['Strategy'] = row['Strategy']
+            self.ids['data_table'].add_widget(order)
+
+        max_contract_total = initial_margin_total = 0
+        for index, row in self.table.iterrows():  # looping for row <----------
+            # filter out the trade is not related to the algo trade strategies
+            if not self.strategies.get(row['Strategy']):
+                continue
+
+            # add widgets
+            add_check_button()
             strategy = self.strategies.get(row['Strategy'])
-            for col in self.table.columns:
-                if col == 'Order':
-                    order = OrderSpinner()
-                    order.ids['Strategy'] = row['Strategy']
-                    self.ids['table_table'].add_widget(order)
+            for col in self.table.columns:  # looping for column <----------
+                # reset params
+                color = (1.0, 1.0, 1.0, 1.0)
+                halign = 'center'
+                label = Label(markup=True, font_size=18, text_size=(col_width, row_height),
+                              size=(col_width, row_height), size_hint=(None, None), valign='middle')
+                value = row[col]
 
-                label = Label(markup=True, font_size=18)
-                """
-                Just leave it, will continue later
-                """
+                # configure columns
+                match col:
+                    case 'Status':
+                        value = strategy.status
+                        self.ids['data_table'].ids[row['Strategy'] + '_Status'] = label  # set id
+                    case 'ExecSet':
+                        value = strategy.exec_set
+                    case 'MaxCtrt':
+                        value = strategy.max_contract
+                        max_contract_total += value
+                    case 'InitMargin':
+                        # if futu_openD not ready
+                        init_margin = 22000 if not self.main_app.futu.contract_detail else \
+                            abs(strategy.max_contract) * self.main_app.futu.contract_detail.get('margin')
+                    case 'Order':
+                        add_order_spinner(row)
+                        continue
 
-    # buttons' callback ---------------------------------------------------------------------------
+                # apply configuration
+                text, color, halign = self.format_label(col, value)
+                label.text, label.color, label.halign = text, color, halign
+
+                # assign id
+                """
+                access method: label = self.ids['data_table'].ids['MAL_PL']
+                """
+                match col:
+                    case 'P / L':
+                        self.ids['data_table'].ids[row['Strategy'] + '_PL'] = label
+                    case 'AvgPrice':
+                        self.ids['data_table'].ids[row['Strategy'] + '_AvgPrice'] = label
+                    case 'Inventory':
+                        self.ids['data_table'].ids[row['Strategy'] + '_Inventory'] = label
+
+                # add widget
+                self.ids['data_table'].add_widget(label)
+
+    # ------------------------------------------------------------------------------------------- #
+    """ button's callback """
+    # ------------------------------------------------------------------------------------------- #
     def start_all(self, instance=None):
         logging.critical("start all")
 
@@ -154,10 +196,12 @@ class AlgoTrade(Widget):
     def set_on_off_algo(self, instance=None):
         logging.critical("set on/off algo")
 
-    def manual_order(self, strategy_name: str, operation: str, instance=None):
+    def manual_order(self, instance, strategy_name: str='', operation: str='',):
         logging.critical(f"manual order {strategy_name} {operation}")
 
-    # helper methods ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------- #
+    """ helper methods """
+    # ------------------------------------------------------------------------------------------- #
     def load_strategies(self):
         """
         Load strategies after all gui had been built (the 'on_start' method from the 'App').
@@ -182,3 +226,32 @@ class AlgoTrade(Widget):
                     self.__setattr__('strategy_' + class_[1].name.lower(), class_[1])
                     # assign strategy to dictionary
                     self.strategies[class_[1].name] = self.__getattribute__('strategy_' + class_[1].name.lower())
+
+    def format_label(self, col, value):
+        color = (1, 1, 1)
+        halign = 'center'
+        text = value
+
+        # format for number
+        if col in ('Inventory', 'P / L', 'MaxCtrt', 'AvgPrice', 'TradedQty', 'Fees', 'InitMargin'):
+            # format number
+            value = value if value else 0
+            text = '{:,.0f}'.format(value)
+            text = '+' + text if col == 'P / L' and value > 0 else text
+
+            # format color
+            if col in ('Inventory', 'P / L', 'MaxCtrt'):
+                color = self.color_map.get('green') if value >= 0 else self.color_map.get('red')
+
+            # format alignment
+            if col in ('P / L', 'AvgPrice', 'TradedQty', 'Fees', 'InitMargin'):
+                halign = 'right'
+
+        # format for string
+        elif col == 'Status':
+            if value in ('ready', 'running', 'waiting'):
+                color = self.color_map.get('green')
+            elif value in ('stop', 'timeout'):
+                color = self.color_map.get('red')
+
+        return str(text), color, halign

@@ -141,6 +141,81 @@ class FutuApi:
         return trade_journal
 
     # ------------------------------------------------------------------------------------------- #
+    """ algo related """
+    # ------------------------------------------------------------------------------------------- #
+    def get_algo_table(self, strategies_name: list, start_date: dt.date, end_date: dt.date):
+        """
+        callback from algo_trade: to return a ready shown table for algo_trade
+        """
+        # initialize algo_table dataframe
+        algo_table_cols = ['Status', 'Strategy', 'ExecSet', 'Inventory', 'P / L', 'MaxCtrt', 'AvgPrice',
+                           'TradedQty', 'Fees', 'Order', 'InitMargin']
+        algo_table = pd.DataFrame(columns=algo_table_cols)
+
+        # get trade journal
+        trade_journal = self.filter_trade_journal(self.get_trade_journal(), start_date, end_date)
+
+        # return dataframe with no trading record
+        if trade_journal.empty:
+            for k in strategies_name:
+                new_index = len(algo_table)
+                algo_table.loc[new_index] = pd.Series()
+                algo_table.fillna(0, inplace=True)
+                algo_table.at[new_index, 'Strategy'] = k
+
+            return algo_table
+
+        # separate data by strategy name
+        datas = {}
+        for i in strategies_name:
+            datas[i] = trade_journal[(trade_journal['remark'].str[:3] == i)]
+
+        # calculate trading values
+        for strategy_name, trade_data in datas.items():
+            new_index = len(algo_table)
+            algo_table.loc[new_index] = pd.Series()
+            algo_table.fillna(0, inplace=True)
+            position, avg_price, trade_vol, fees, pnl_value = self.calculate_trading_data(trade_data)
+            algo_table.at[new_index, 'Strategy'] = strategy_name
+            algo_table.at[new_index, 'Inventory'] = position
+            algo_table.at[new_index, 'AvgPrice'] = avg_price
+            algo_table.at[new_index, 'TradedQty'] = trade_vol
+            algo_table.at[new_index, 'Fees'] = fees
+            algo_table.at[new_index, 'P / L'] = pnl_value
+
+        return algo_table
+
+    def calculate_trading_data(self, trade_journal: pd.DataFrame):
+        position = buy_avg_price = sell_avg_price = avg_price = trade_vol = pnl_price = 0
+        symbol = 'MHI'
+        for i, row in trade_journal[::-1].iterrows():
+            side, price, qty = row['trd_side'], row['price'], row['qty']
+
+            # calculate buy/sell average price
+            if 'BUY' in side:
+                position += qty
+                buy_avg_price += price * qty
+            elif 'SELL' in side:
+                position -= qty
+                sell_avg_price += price * qty
+            trade_vol += qty
+
+            # calculate average price
+            if position == 0:
+                pnl_price += sell_avg_price - buy_avg_price
+                buy_avg_price = sell_avg_price = 0
+            else:
+                avg_price = buy_avg_price - sell_avg_price
+
+        # calculate fees, average_price and pnl
+        point_value = 10
+        fees = self.fees_count(symbol, trade_vol)
+        avg_price = avg_price / position if position else 0
+        pnl_value = pnl_price * point_value - fees
+
+        return int(position), abs(int(avg_price)), trade_vol, int(fees), int(pnl_value)
+
+    # ------------------------------------------------------------------------------------------- #
     """ update gui """
     # ------------------------------------------------------------------------------------------- #
     def init_gui(self, start_date: dt.date, end_date: dt.date):
@@ -153,22 +228,28 @@ class FutuApi:
     """ helper methods """
     # ------------------------------------------------------------------------------------------- #
     def filter_trade_journal(self, df: pd.DataFrame, start_date: dt.date, end_date: dt.date) -> pd.DataFrame:
+        """
+        to filter the date between start_date and end_date
+        """
         start = dt.datetime.strftime(start_date, '%Y-%m-%d') + ' 09:16:00'
         end = end_date + dt.timedelta(days=1)
         end = dt.datetime.strftime(end, '%Y-%m-%d') + ' 03:00:00'
         return df[(df['create_time'] >= start) & (df['create_time'] <= end)].reset_index(drop=True)
 
-    def get_algo_table(self, trade_journal: pd.DataFrame) -> pd.DataFrame:
-        """
-        convert trade journal to algo table
-        """
-        pass
-        # cols = ['Status', 'Strategy', 'ExecSet', 'Inventory', 'P / L', 'MaxCtrt', 'AvgPrice', 'TradedQty',
-        #         'Fees', 'Order', 'InitMargin']
-        # logging.error(self.algo.strategies)
-        # for i, strategy_name in enumerate(self.algo.strategies.keys()):
-        #     logging.info(strategy_name)
-        #     position, average_price, traded_qty, fees, pnl_value = self.cal_algo_data(trade_journal, strategy_name)
-
     def cal_algo_data(self, trade_journal: pd.DataFrame, strategy_name: str) -> (int, int, int, int, int):
         pass
+
+    def fees_count(self, symbol: str, trd_vol: int):
+        comm = plt_fees = exch_fees = sfc_fees = 0
+        if symbol == 'HSI':
+            comm = 8
+            plt_fees = 5
+            exch_fees = 10
+            sfc_fees = 0.54
+        elif symbol == 'MHI':
+            comm = 2
+            plt_fees = 5
+            exch_fees = 3.5
+            sfc_fees = 0.1
+
+        return (comm + plt_fees + exch_fees + sfc_fees) * trd_vol
