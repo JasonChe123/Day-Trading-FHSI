@@ -223,15 +223,13 @@ class AlgoTrade(Widget):
 
                 # import all classes as strategies
                 for class_ in inspect.getmembers(module, inspect.isclass):  # [(class_name, class_instance), ...]
-                    logging.critical(class_)
                     if class_[0] == 'AlgoTemplate':
                         continue
-                    self.__setattr__(
-                        'strategy_' + class_[1].name.lower(),
-                        class_[1](self.main_app, 'MHI')
-                    )
+                    self.__setattr__(class_[1].name.lower(),
+                                     class_[1](self.main_app, 'MHI')
+                                     )
                     # assign strategy to dictionary
-                    self.strategies[class_[1].name] = self.__getattribute__('strategy_' + class_[1].name.lower())
+                    self.strategies[class_[1].name] = self.__getattribute__(class_[1].name.lower())
 
     def format_label(self, col, value):
         color = (1, 1, 1)
