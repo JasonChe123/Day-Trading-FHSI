@@ -52,9 +52,8 @@
 
 <OrderSpinner>:
     text: 'PlsSelect'
-    values: ('Buy', 'Sell', 'Cover')
+    values: ('PlsSelect', 'Buy', 'Sell', 'Cover')
     size: 80, 30
     size_hint: None, None
     background_color: (1, 0.3, 0.3, 1) if self.text == 'Sell' else (0.3, 1, 0.3, 1) if self.text == 'Buy' else (0.3, 0.3, 0.3, 1) if self.text == 'PlsSelect' else (0.3, 0.5, 0.5, 1)
     option_cls: 'MyOrderSpinnerOption'
-    on_text: app.algo_main_page.algo_trade.manual_order(self)

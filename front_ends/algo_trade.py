@@ -11,7 +11,7 @@ from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.checkbox import CheckBox
 from kivy.uix.label import Label
-from kivy.uix.spinner import Spinner
+from kivy.uix.spinner import Spinner, SpinnerOption
 from kivy.uix.widget import Widget
 from KivyCalendar import DatePicker
 
@@ -31,7 +31,9 @@ class OrderSpinner(Spinner):
     """
     drop down menu for order selection (buy/ sell/ cover)
     """
-    pass
+    def _on_dropdown_select(self, instance, data, *largs):
+        super()._on_dropdown_select(instance, data, *largs)
+        App.get_running_app().algo_main_page.algo_trade.manual_order(self)
 
 
 class AlgoTrade(Widget):
@@ -196,7 +198,7 @@ class AlgoTrade(Widget):
     def set_on_off_algo(self, instance=None):
         logging.critical("set on/off algo")
 
-    def manual_order(self, instance=None, strategy_name: str='', operation: str='',):
+    def manual_order(self, instance: Spinner = None, strategy_name: str = '', operation: str = '',):
         """
         callback from order spinner in algo_trade
         """
@@ -206,10 +208,12 @@ class AlgoTrade(Widget):
 
         match operation:
             case 'Buy' | 'Sell':
+                logging.critical("Do something")
                 qty = strategy.exec_set
                 side = operation.upper()
                 remark = 'LE(MAN)' if side == 'BUY' else 'SE(MAN)'
             case 'Cover':
+                logging.critical("Do something")
                 qty = abs(strategy.inv_algo)
                 if not qty:
                     logging.critical("Nothing to be covered.")
@@ -217,9 +221,10 @@ class AlgoTrade(Widget):
                 side = 'SELL' if strategy.inv_algo > 0 else 'BUY'
                 remark = 'MANUAL COVER'
             case _:
+                logging.critical("Do something")
                 return
 
-        self.main_app.futu.fire_trade(side=side, qty=qty, remark=remark)
+        # self.main_app.futu.fire_trade(side=side, qty=qty, remark=remark)
 
     # ------------------------------------------------------------------------------------------- #
     """ helper methods """
