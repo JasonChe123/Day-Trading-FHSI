@@ -1,5 +1,4 @@
-algorithm/mal_ready.py
-algorithm/swl.py
+algorithm/*
 database/log/*
 database/trade_journal/*
 front_ends/__pycache__/
