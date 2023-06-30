@@ -5,6 +5,10 @@ import threading as th
 
 
 class AlgoTemplate:
+    version = None
+    launch_date = None
+    name = None
+
     # initialization ----------------------------------------------------------
     def __init__(self, main_app: type, symbol: str, start: dt.time, open_order_start: dt.time,
                  open_order_end: dt.time, timeout: dt.time):
@@ -22,7 +26,6 @@ class AlgoTemplate:
         self.kline_daily = pd.DataFrame()
 
         # algo params
-        self.name = 'ALGO'
         self.max_contract = 3
         self.exec_set = 1
         self.first_entry_price = None

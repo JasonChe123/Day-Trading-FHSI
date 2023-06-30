@@ -92,7 +92,7 @@ class AlgoTrade(Widget):
         self.main_app.popup.dismiss()
 
         # do nothing if no any running strategies
-        if not self.strategies:
+        if not self.strategies.keys():
             return
 
         # setup self.table in DataFrame format
@@ -190,7 +190,7 @@ class AlgoTrade(Widget):
         logging.critical("cover all")
 
     def refresh(self, instance=None):
-        logging.critical(f"refresh {self.start_date} {self.end_date}")
+        self.update_table()
 
     def update_auto_shutdown(self, instance=None):
         logging.critical(f"update auto shutdown {instance.active}")
@@ -208,23 +208,21 @@ class AlgoTrade(Widget):
 
         match operation:
             case 'Buy' | 'Sell':
-                logging.critical("Do something")
                 qty = strategy.exec_set
                 side = operation.upper()
-                remark = 'LE(MAN)' if side == 'BUY' else 'SE(MAN)'
+                remark = 'LE-MANUAL' if side == 'BUY' else 'SE-MANUAL'
             case 'Cover':
-                logging.critical("Do something")
                 qty = abs(strategy.inv_algo)
                 if not qty:
                     logging.critical("Nothing to be covered.")
                     return
                 side = 'SELL' if strategy.inv_algo > 0 else 'BUY'
-                remark = 'MANUAL COVER'
+                remark = 'COVER-MANUAL'
             case _:
-                logging.critical("Do something")
                 return
 
-        # self.main_app.futu.fire_trade(side=side, qty=qty, remark=remark)
+        self.main_app.futu.fire_trade(side=side, qty=qty, remark='-'.join([strategy.name, remark]))
+        self.refresh()
 
     # ------------------------------------------------------------------------------------------- #
     """ helper methods """
@@ -286,3 +284,6 @@ class AlgoTrade(Widget):
                 color = self.color_map.get('red')
 
         return str(text), color, halign
+
+    def update_strategy_params(self):
+        pass

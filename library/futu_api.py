@@ -2,6 +2,7 @@ import logging
 import os
 import datetime as dt
 import pandas as pd
+import re
 import threading as th
 import uuid
 
@@ -109,14 +110,13 @@ class FutuApi:
             return
 
         def demo_order():
-            logging.critical(f"Demo order: side={side} qty={qty} remark={remark}")
-
             # get market data (orderbook)
             ret_code, ret_data = self.qot_ctx.get_order_book(self.contract_detail.get('full_code'), 1)
             if ret_code != ft.RET_OK:
                 logging.warning(ret_data)
-                return
-            bid_price, ask_price = ret_data['Bid'][0][0], ret_data['Ask'][0][0]
+                bid_price, ask_price = 20000, 20002
+            else:
+                bid_price, ask_price = ret_data['Bid'][0][0], ret_data['Ask'][0][0]
 
             # set trading params
             exec_price = bid_price if side == 'SELL' else ask_price
@@ -124,7 +124,7 @@ class FutuApi:
 
             # update order history and deal history
             self.update_demo_order_history(create_time, side, qty, exec_price, remark, order_type)
-            self.update_demo_trade_deal_history()
+            self.update_demo_trade_deal_history(create_time, side, qty, exec_price)
 
             # for separate order
             if separate_qty:
@@ -167,12 +167,14 @@ class FutuApi:
 
     def get_trade_journal(self) -> pd.DataFrame:
         if self.main_app.is_demo:
+            # read local csv file
             if os.path.isfile(self.trade_journal_file_path):
                 logging.debug(f"read {self.trade_journal_file_path}")
                 return pd.read_csv(self.trade_journal_file_path)
             else:
                 return pd.DataFrame()
         else:
+            # request futu-api
             pass
 
     def refresh_trade_journal(self, start_date: dt.date, end_date: dt.date, trade_journal: pd.DataFrame = pd.DataFrame()):
@@ -186,11 +188,76 @@ class FutuApi:
 
     def update_demo_order_history(self, create_time: str, trd_side: str, qty: int, price: int,
                                   remark: str, order_type: str):
+        """
+        simulate futu trade_order_history
+        """
+        # set columns as real_trading needed
         ret_code, ret_data = self.trd_ctx.history_order_list_query()
         columns = ret_data.columns
+        order_journal = pd.DataFrame(columns=columns)
 
-    def update_demo_trade_deal_history(self):
-        pass
+        # add data
+        code = self.contract_detail.get('full_code')
+        self.demo_order_id = uuid.uuid4()
+        order_journal.loc[0] = pd.Series()
+        order_journal.at[0, 'code'] = code,
+        order_journal.at[0, 'stock_name'] = code.lstrip('HK.')[:3]
+        order_journal.at[0, 'trd_side'] = trd_side
+        order_journal.at[0, 'order_type'] = order_type
+        order_journal.at[0, 'order_id'] = self.demo_order_id
+        order_journal.at[0, 'dealt_qty'] = qty
+        order_journal.at[0, 'price'] = price
+        order_journal.at[0, 'create_time'] = create_time
+        order_journal.at[0, 'remark'] = remark
+        self.write_order_journal(order_journal)
+
+    def write_order_journal(self, data: pd.DataFrame):
+        self.order_journal = pd.concat([data, self.order_journal], ignore_index=True)
+
+    def update_demo_trade_deal_history(self, create_time: str, side: str, qty: int, price: int):
+        """
+        simulate futu trade_deal_history
+        """
+        code = self.contract_detail.get('full_code')
+        trade_journal = pd.DataFrame(
+            pd.Series({'trd_side': side,
+                       'deal_id': self.demo_order_id,
+                       'order_id': self.demo_order_id,
+                       'code': code,
+                       'stock_name': code.lstrip('HK.')[:3],
+                       'qty': qty,
+                       'price': price,
+                       'create_time': create_time,
+                       'counter_broker_id': 0,
+                       'counter_broker_name': '',
+                       'status': 'OK'
+                       })
+        ).T
+        self.write_trade_journal(trade_journal)
+
+    def write_trade_journal(self, data: pd.DataFrame):
+        # filter for current traded symbol
+        data = data[
+            data['code'].str[3:6] == self.contract_detail.get('full_code')[3:6]
+        ]
+        if data.empty:
+            return
+        data = self.format_trade_journal(data)
+
+        # add remark value
+        trade_journal = self.get_trade_journal()
+        for i, row in data.iterrows():
+            # filter order id
+            order_id = row['order_id']
+            df = self.order_journal[self.order_journal['order_id'] == order_id].reset_index(drop=True)
+            if df.empty:
+                # todo: order_handler sometime behind trade_hander in real trading
+                return
+            data.at[i, 'remark'] = df['remark'][0]
+
+        # write to database
+        data = data.drop(['order_id'], axis=1)
+        pd.concat([data, trade_journal], ignore_index=True).to_csv(self.trade_journal_file_path, index=False)
 
     # ------------------------------------------------------------------------------------------- #
     """ algo related """
@@ -305,3 +372,25 @@ class FutuApi:
             sfc_fees = 0.1
 
         return (comm + plt_fees + exch_fees + sfc_fees) * trd_vol
+
+    def format_trade_journal(self, dealt_list: pd.DataFrame):
+        # extract necessary columns
+        data = dealt_list[
+            ['create_time', 'code', 'trd_side', 'price', 'qty', 'status', 'order_id']
+        ].copy()
+
+        # add remark column
+        data ['remark'] = ''
+
+        # formatting
+        data['qty'] = data.apply(lambda col: int(col['qty']), axis=1)
+        data['create_time'] = data.apply(lambda col: self.find_trading_datetime(col['create_time']), axis=1)
+
+        return data
+
+    def find_trading_datetime(self, time_str: str):
+        res = re.search('....-..-.. ..:..:..', time_str)
+        if not res:
+            return "no time was found"
+
+        return time_str[res.start():res.end()]
