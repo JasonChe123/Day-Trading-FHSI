@@ -43,7 +43,7 @@ def config_logging(is_demo: bool, proj_dir: os.path):
     file_path = os.path.join(proj_dir, 'database', 'log', file_name)
 
     # set handlers
-    file_handler = logging.FileHandler(file_path, encoding='utf-8')
+    file_handler = logging.FileHandler(file_path, encoding='utf-8', mode='w')
     stream_handler = logging.StreamHandler(sys.stdout)
     stream_handler.setLevel(logging.DEBUG)  # todo: should be set to INFO, DEBUG is just for developing stage
 
