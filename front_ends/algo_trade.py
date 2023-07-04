@@ -96,16 +96,16 @@ class AlgoTrade(Widget):
             return
 
         # setup self.table in DataFrame format
-        self.table = self.main_app.futu.get_algo_table(self.strategies.keys(), self.start_date, self.end_date)
+        self.algo_table = self.main_app.futu.get_algo_table(self.strategies.keys(), self.start_date, self.end_date)
 
         # initialize table (gui)
         self.ids['data_table'].clear_widgets()
         col_width, row_height = 80, 30
-        self.ids['data_table'].cols = len(self.table.columns) + 1  # include column for 'on/off' checkbutton
+        self.ids['data_table'].cols = len(self.algo_table.columns) + 1  # include column for 'on/off' checkbutton
 
         # add headers
         self.ids['data_table'].add_widget(Widget(size=(22, row_height), size_hint=(None, None)))  # on/off column
-        for header in self.table.columns:
+        for header in self.algo_table.columns:
             self.ids['data_table'].add_widget(
                 Button(text=header, size=(col_width, row_height), size_hint=(None, None),
                        background_normal='', background_down='', background_color=self.color_map.get('grey'))
@@ -124,7 +124,7 @@ class AlgoTrade(Widget):
             self.ids['data_table'].add_widget(order)
 
         max_contract_total = initial_margin_total = 0
-        for index, row in self.table.iterrows():  # looping for row <----------
+        for index, row in self.algo_table.iterrows():  # looping for row <----------
             # filter out the trade is not related to the algo trade strategies
             if not self.strategies.get(row['Strategy']):
                 continue
@@ -132,7 +132,7 @@ class AlgoTrade(Widget):
             # add widgets
             add_check_button()
             strategy = self.strategies.get(row['Strategy'])
-            for col in self.table.columns:  # looping for column <----------
+            for col in self.algo_table.columns:  # looping for column <----------
                 # reset params
                 color = (1.0, 1.0, 1.0, 1.0)
                 halign = 'center'
@@ -176,6 +176,28 @@ class AlgoTrade(Widget):
 
                 # add widget
                 self.ids['data_table'].add_widget(label)
+
+    def update_realtime_pnl(self, price: float):
+        if self.algo_table.empty:
+            return
+
+        df = self.algo_table.copy()
+        pnl_total = inv_total = 0
+        point_value = 10
+        for index, row in df.iterrows():
+            strategy_name = row['Strategy']
+            if row['Inventory']:
+                # calculate realtime P/L
+                realize_pnl = row['P / L']
+                inventory = row['Inventory']
+                avg_price = row['AvgPrice']
+                realtime_pnl = realize_pnl + (price - avg_price)*inventory*point_value
+
+                # update label
+                label = self.ids['data_table'].ids[f'{strategy_name}_PL']  # get label widget
+                label.color = (0, 1, 0, 1) if realtime_pnl >= 0 else (1, 0, 0, 1)
+                text = '{:,.0f}'.format(realtime_pnl)
+                label.text = f'[b]{text}[/b]' if realtime_pnl < 0 else f'[b]{"+"+text}[/b]'
 
     # ------------------------------------------------------------------------------------------- #
     """ button's callback """

@@ -7,7 +7,7 @@ import threading as th
 from library.contract_info import get_contract_year_and_month
 
 from ibapi.client import EClient
-from ibapi.wrapper import EWrapper, BarData
+from ibapi.wrapper import EWrapper, BarData, TickerId, TickType, TickAttrib
 from ibapi.contract import Contract
 
 os.environ['KIVY_LOG_MODE'] = 'MIXED'
@@ -23,6 +23,7 @@ class IBApi(EWrapper, EClient):
         self.client_id = random.choice(range(1000, 9999, 1))
         self.request_id = {'FHSI_1M': 10000,
                            'FHSI_1D': 100001}
+        self.lock = th.Lock()
 
         # setup contract
         self.contract = Contract()
@@ -52,21 +53,44 @@ class IBApi(EWrapper, EClient):
         th.Thread(target=self.run, args=[]).start()
 
     def request_market_data(self):
-        # request 1-min kline historical and push data
-        self.reqHistoricalData(reqId=self.request_id.get('FHSI_1M'),
-                               contract=self.contract,
-                               endDateTime='',
-                               durationStr='3 D',
-                               barSizeSetting='1 min',
-                               whatToShow='TRADES',
-                               useRTH=False,
-                               formatDate=True,
-                               keepUpToDate=True,
-                               chartOptions=[]
-                               )
+        def request_kline(request_id: int, duration: str, bar_size: str):
+            self.reqHistoricalData(reqId=request_id,
+                                   contract=self.contract,
+                                   endDateTime='',
+                                   durationStr=duration,
+                                   barSizeSetting=bar_size,
+                                   whatToShow='TRADES',
+                                   useRTH=False,
+                                   formatDate=True,
+                                   keepUpToDate=True,
+                                   chartOptions=[]
+                                   )
 
+        # todo: to be applied later
+        # request_kline(request_id=self.request_id.get('FHSI_1M'), duration='3 D', bar_size='1 min')
+        # request_kline(request_id=self.request_id.get('FHSI_1D'), duration='5 D', bar_size='1 day')
+
+        # request tick price
+        self.reqMktData(reqId=self.request_id.get('FHSI_1M'), contract=self.contract, genericTickList='',
+                        snapshot=False, regulatorySnapshot=False, mktDataOptions=[])
+
+    # ------------------------------------------------------------------------------------------- #
+    """ system callbacks """
+    # ------------------------------------------------------------------------------------------- #
     def historicalData(self, reqId: int, bar: BarData):
         logging.critical('historicalData')
 
     def historicalDataUpdate(self, reqId: int, bar: BarData):
-        logging.critical('historicalDataUpdate')
+        if reqId == self.request_id.get('FHSI_1M'):
+            self.update_kline(bar)
+
+    def tickPrice(self, reqId: TickerId , tickType: TickType, price: float, attrib: TickAttrib):
+        if reqId == self.request_id.get('FHSI_1M') and tickType == 4:  # last price at which the contract traded
+            self.algo.update_realtime_pnl(price)
+
+    # ------------------------------------------------------------------------------------------- #
+    """ algo methods """
+    # ------------------------------------------------------------------------------------------- #
+    def update_kline(self, bar: BarData):
+        with self.lock:
+            pass
