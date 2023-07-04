@@ -47,7 +47,7 @@ class AccountInfo(Widget):
             h = header.replace('_', ' ').title()
             button = Button(text=h, halign='left', valign='center',
                             size=(250, row_height), size_hint=(None, None),
-                            background_normal='', background_down='', background_color=(0.1, 0.1, 0.3, 0.5))
+                            background_normal='', background_down='', background_color=(0.1, 0.1, 0.3, 1.0))
             button.text_size = button.size
             self.ids['funds_table'].add_widget(button)
 
@@ -55,7 +55,7 @@ class AccountInfo(Widget):
             value = data.at[0, header]
             color = (1.0, 1.0, 1.0, 1.)
             if isinstance(value, int | float):
-                color = (1.0, 0.2, 0.2, 1.0) if value < 0 else color
+                color = (1.0, 0.0, 0.0, 1.0) if value < 0 else color
                 value = '{:,.0f}'.format(value)
             button = Button(text=value, halign='left', valign='center',
                             size=(100, row_height), size_hint=(None, None),
