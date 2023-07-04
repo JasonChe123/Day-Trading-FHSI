@@ -68,6 +68,7 @@ class AlgoTradeForFHSI(App):
         self.ibapi = IBApi()
         self.futu.connect(unlock_trade_password=FUTU_UNLOCK_TRADE_PASSWORD)
         self.ibapi.init_connection()
+        self.ibapi.request_market_data()
 
 
 def get_system_arguments():
@@ -109,7 +110,7 @@ if __name__ == '__main__':
     PROJECT_DIR = os.getcwd()
     sys_params = get_system_arguments()
 
-    # set system params
+    # get system params
     FUTU_UNLOCK_TRADE_PASSWORD = int(sys_params['futu_pwd'])
     IB_TWS_USER_NAME = sys_params['ib_username']
     IB_TWS_LOGIN_PWD = sys_params['ib_pwd']
@@ -132,6 +133,8 @@ if __name__ == '__main__':
     # build gui
     Window.size = (450, 800)
     app = AlgoTradeForFHSI()
+
+    # run application
     app.run()
 
     # todo: kill futu_open_d

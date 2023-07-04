@@ -1,3 +1,4 @@
+algorithm/*
 database/log/*
 database/trade_journal/*
 front_ends/__pycache__/
