@@ -49,6 +49,7 @@ class AlgoTrade(Widget):
         }
         self.auto_shutdown = self.ids['checkbox_auto_shutdown'].active  # get checkbox by 'id' in kv file
         self.strategies = {}
+        self.algo_table = pd.DataFrame()
         self.calendar = Calendar(self)
 
         # initialize start and end date
@@ -259,7 +260,7 @@ class AlgoTrade(Widget):
 
         # check if 'ready' in strategy_file_names
         for file_name in strategy_file_names:
-            if 'ready' in file_name:
+            if 'ready' in file_name and file_name[:3] in self.strategies.keys():
                 # import module from file
                 spec = importlib.util.spec_from_file_location(
                     os.path.splitext(file_name)[0],
