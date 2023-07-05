@@ -260,7 +260,7 @@ class AlgoTrade(Widget):
 
         # check if 'ready' in strategy_file_names
         for file_name in strategy_file_names:
-            if 'ready' in file_name and file_name[:3] in self.strategies.keys():
+            if 'ready' in file_name and file_name[:3] in self.main_app.running_strategies:
                 # import module from file
                 spec = importlib.util.spec_from_file_location(
                     os.path.splitext(file_name)[0],
