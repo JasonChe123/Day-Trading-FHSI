@@ -44,7 +44,7 @@ class AlgoTrade(Widget):
         self.main_app = App.get_running_app()
         self.color_map = {
             'green': (0.3, 1.0, 0.3, 1.0),
-            'red': (1.0, 0.2, 0.2, 1.0),
+            'red': (0.7, 0.2, 0.2, 1.0),
             'grey': (0.3, 0.3, 0.3, 1)
         }
         self.auto_shutdown = self.ids['checkbox_auto_shutdown'].active  # get checkbox by 'id' in kv file
@@ -61,6 +61,13 @@ class AlgoTrade(Widget):
         self.end_date = self.today
         self.ids['label_date_from'].text = dt.datetime.strftime(self.start_date, '%d-%b-%y')
         self.ids['label_date_to'].text = dt.datetime.strftime(self.end_date, '%d-%b-%y')
+
+    # ------------------------------------------------------------------------------------------- #
+    """ algorithm """
+    # ------------------------------------------------------------------------------------------- #
+    def update_kline(self, kline: pd.DataFrame):
+        for strategy in self.strategies.values():
+            strategy.update_kline(kline)
 
     # ------------------------------------------------------------------------------------------- #
     """ update gui """
@@ -200,6 +207,12 @@ class AlgoTrade(Widget):
                 text = '{:,.0f}'.format(realtime_pnl)
                 label.text = f'[b]{text}[/b]' if realtime_pnl < 0 else f'[b]{"+"+text}[/b]'
 
+    def update_status(self, strategy_name: str, status: str):
+        text, color, halign = self.format_label('Status', status)
+        label = self.ids['data_table'].ids[f'{strategy_name}_Status']
+        label.text = text
+        label.color = color
+
     # ------------------------------------------------------------------------------------------- #
     """ button's callback """
     # ------------------------------------------------------------------------------------------- #
@@ -305,6 +318,8 @@ class AlgoTrade(Widget):
                 color = self.color_map.get('green')
             elif value in ('stop', 'timeout'):
                 color = self.color_map.get('red')
+            elif value in ('waiting',):
+                color = self.color_map.get('grey')
 
         return str(text), color, halign
 

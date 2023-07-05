@@ -108,6 +108,9 @@ class IBApi(EWrapper, EClient):
         self.kline.loc[len(self.kline)] = new_row
 
     def update_kline(self, bar: BarData):
-        logging.critical(self.kline)
         with self.lock:
-            pass
+            time_key = dt.datetime.strptime(bar.date, '%Y%m%d  %H:%M:%S')
+            # check if new bar comes
+            if time_key != self.kline['time_key'][self.kline.index[-1]]:
+                self.algo.update_kline(self.kline.copy())
+                self.init_kline(bar)

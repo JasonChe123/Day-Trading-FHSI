@@ -9,7 +9,9 @@ class AlgoTemplate:
     launch_date = None
     name = None
 
-    # initialization ----------------------------------------------------------
+    # ------------------------------------------------------------------------------------------- #
+    """ initialization """
+    # ------------------------------------------------------------------------------------------- #
     def __init__(self, main_app: type, symbol: str, start: dt.time, open_order_start: dt.time,
                  open_order_end: dt.time, timeout: dt.time):
         """
@@ -58,7 +60,9 @@ class AlgoTemplate:
         """initialize take profit point and stoploss point if necessary"""
         pass
 
-    # operations --------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------- #
+    """ operation """
+    # ------------------------------------------------------------------------------------------- #
     def place_order(self, side: str, qty: int, remark: str, order_type: str = 'MARKET', index: int = 0):
         """
         final check and send the order to broker
@@ -77,8 +81,8 @@ class AlgoTemplate:
             self.main_app.fire_trade(side, qty, f'{self.name}-{remark}', order_type, index=index)
             return
         else:
+            # to avoid place_order repeatedly
             if self._can_trade:
-                # to avoid proceed place_order repeatedly
                 self._can_trade = False
 
                 if self.mode == 'reverse':
@@ -94,9 +98,11 @@ class AlgoTemplate:
 
     def update_status(self, status: str):
         self.status = status
-        self.main_app.update_status(self.name, status)
+        self.main_app.algo_main_page.algo_trade.update_status(self.name, status)
 
-    # helper methods ----------------------------------------------------------
+    # ------------------------------------------------------------------------------------------- #
+    """ helper methods """
+    # ------------------------------------------------------------------------------------------- #
     def _get_order_id(self):
         """
         return available identification number
@@ -164,7 +170,9 @@ class AlgoTemplate:
         else:
             return False
 
-    # algorithm ---------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------- #
+    """ algorithm """
+    # ------------------------------------------------------------------------------------------- #
     def apply_indicators(self, kline):
         """applying indicators to the kline if the engine is backtest"""
         pass
@@ -173,35 +181,48 @@ class AlgoTemplate:
         pass
 
     def update_kline(self, kline: pd.DataFrame, index: int = 0):
-        # check strategy turn on/ off
+        """
+        in live trading: the latest kline would be used, get last index from kline
+        in backtesting: the whole kline data and index are received and would study the specific index in the kline
+        """
+        # for backtest engine
         if self.main_app.engine == 'backtest':
             self.backtest_in_out_logic(kline, index)
             return
 
+        # for live engine (demo/ real), check on/off algo
         if self.main_app.engine == 'live':
             if not self.is_turn_on:
-                logging.debug(f"{self.name} is turned off", log_level='live')
+                logging.debug(f"{self.name} is turned off")
                 return
             else:
-                logging.debug(f"{self.name} is turned on", log_level='live')
+                logging.debug(f"{self.name} is turned on")
                 self.kline = kline
 
-        self.update_indicator(kline)
+        # if stop_trade (by any reason), do nothing
         if self.is_stop_trade:
-            logging.debug(f"strategy {self.name} stop", log_level='live')
+            logging.debug(f"strategy {self.name} stop")
             return
+        # if timeout, close all positions
         elif self.check_is_timeout(kline):
-            logging.debug(f"strategy {self.name} timeout", log_level='live')
+            # todo: close all position
+            logging.debug(f"strategy {self.name} timeout")
             return
         else:
+            # run indicators
+            self.update_indicator(kline)
+
+            # check exit logic first
             if self.inv_algo:
                 self.check_exit_conditions(kline)
 
+            # check entry logic if self.can_open_order
             if self._check_can_open_order(kline):
                 self.check_entry_conditions(kline)
 
     def backtest_in_out_logic(self, kline: pd.DataFrame, index: int):
         if self.inv_algo == 0:
+            # todo: check can_open_order
             self.check_entry_conditions(kline=kline, index=index)
         else:
             self.check_is_timeout(kline, index)
@@ -210,38 +231,31 @@ class AlgoTemplate:
         # else:
         #     self.check_entry_conditions(kline, index=index)
 
-    def check_is_timeout(self, kline: pd.DataFrame, index: int=0):
+    def check_is_timeout(self, kline: pd.DataFrame, index: int = 0):
         """return True if algo timeout"""
         def set_timeout(flag: bool):
             self.is_timeout = True if flag else False
             return flag
 
         if self.main_app.engine == 'live':
-            index = self.kline.index[-1]
+            index = self.kline.index[-1]  # get index
 
-        # time_key = self.kline['time_key'].iloc[index].time()
         time_key = self.kline['time_key'].iloc[index]
-        # time_key = dt.datetime.strptime(time_key, '%Y-%m-%d %H:%M:%S')
-
         if self.algo_timeout_time.hour > 3:
             if self.algo_timeout_time <= time_key.time() or time_key.hour <= 3:
                 return set_timeout(True)
+
         elif self.algo_timeout_time <= time_key.time() and time_key.hour <= 3:
             return set_timeout(True)
+
         elif time_key.hour == 12 and time_key.minute == 28:
             return set_timeout(True)
+
         time_str = dt.datetime.strftime(time_key, '%Y-%m-%d %H:%M:%S')
 
         # special timeout
-        if time_str in ('2022-11-02 13:54:00',):
+        if time_str in ('2022-11-02 13:54:00', '2023-04-12 16:14:00'):
             return set_timeout(True)
-
-        # elif time_key.year == 2022 and time_key.month == 11 and time_key.day == 2 and\
-        #         time_key.hour == 13 and time_key.minute == 54:
-        #     return set_timeout(True)
-        # elif time_key.year == 2023 and time_key.mont == 4 and time_key.day == 12 and\
-        #     time_key.hour == 16 and time_key.minute == 14:
-        #     return set_timeout(True)
 
         return set_timeout(False)
 
@@ -251,13 +265,10 @@ class AlgoTemplate:
         return True if time_key within open order period
         """
         def set_can_open_order(flag: bool):
-            if flag:
-                self.can_open_order = True
-                self.is_timeout = False
-            else:
-                self.can_open_order = False
-                self.is_timeout = False  # can close order, not timeout
-            self.update_status('running')
+            self.can_open_order = flag
+            status = 'timeout' if not flag and not self.inv_algo else 'running'
+            self.update_status(status)
+
             return flag
 
         time_key = kline['time_key'].iloc[-1].time()
