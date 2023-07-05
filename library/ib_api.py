@@ -1,8 +1,11 @@
+import datetime as dt
 import logging
 import os
 import random
 import socket
 import threading as th
+
+import pandas as pd
 
 from library.contract_info import get_contract_year_and_month
 
@@ -24,6 +27,7 @@ class IBApi(EWrapper, EClient):
         self.request_id = {'FHSI_1M': 10000,
                            'FHSI_1D': 100001}
         self.lock = th.Lock()
+        self.kline = pd.DataFrame(columns=['code', 'open', 'high', 'low', 'close', 'volume', 'time_key'])
 
         # setup contract
         self.contract = Contract()
@@ -66,9 +70,8 @@ class IBApi(EWrapper, EClient):
                                    chartOptions=[]
                                    )
 
-        # todo: to be applied later
-        # request_kline(request_id=self.request_id.get('FHSI_1M'), duration='3 D', bar_size='1 min')
-        # request_kline(request_id=self.request_id.get('FHSI_1D'), duration='5 D', bar_size='1 day')
+        request_kline(request_id=self.request_id.get('FHSI_1M'), duration='2 D', bar_size='1 min')
+        request_kline(request_id=self.request_id.get('FHSI_1D'), duration='5 D', bar_size='1 day')
 
         # request tick price
         self.reqMktData(reqId=self.request_id.get('FHSI_1M'), contract=self.contract, genericTickList='',
@@ -78,7 +81,9 @@ class IBApi(EWrapper, EClient):
     """ system callbacks """
     # ------------------------------------------------------------------------------------------- #
     def historicalData(self, reqId: int, bar: BarData):
-        logging.critical('historicalData')
+        # only build kline for 1 min FHSI
+        if reqId == self.request_id.get('FHSI_1M'):
+            self.init_kline(bar)
 
     def historicalDataUpdate(self, reqId: int, bar: BarData):
         if reqId == self.request_id.get('FHSI_1M'):
@@ -91,6 +96,18 @@ class IBApi(EWrapper, EClient):
     # ------------------------------------------------------------------------------------------- #
     """ algo methods """
     # ------------------------------------------------------------------------------------------- #
+    def init_kline(self, bar: BarData):
+        """
+        to build the kline from historical data
+        """
+        time_key = dt.datetime.strptime(bar.date, '%Y%m%d  %H:%M:%S')
+        new_row = pd.Series(
+            dict(zip(['code', 'open', 'high', 'low', 'close', 'volume', 'time_key'],
+                     ['FHSI', bar.open, bar.high, bar.low, bar.close, bar.volume, time_key]))
+        )
+        self.kline.loc[len(self.kline)] = new_row
+
     def update_kline(self, bar: BarData):
+        logging.critical(self.kline)
         with self.lock:
             pass
