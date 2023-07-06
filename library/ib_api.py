@@ -114,3 +114,8 @@ class IBApi(EWrapper, EClient):
             if time_key != self.kline['time_key'][self.kline.index[-1]]:
                 self.algo.update_kline(self.kline.copy())
                 self.init_kline(bar)
+            else:
+                self.kline.loc[self.kline.index[-1]] = pd.Series(
+                    dict(zip(['code', 'open', 'high', 'low', 'close', 'volume', 'time_key'],
+                             ['FHSI', bar.open, bar.high, bar.low, bar.close, bar.volume, time_key]))
+                )

@@ -205,8 +205,14 @@ class AlgoTemplate:
             return
         # if timeout, close all positions
         elif self.check_is_timeout(kline):
-            # todo: close all position
             logging.debug(f"strategy {self.name} timeout")
+            if self.inv_algo > 0:
+                side = 'SELL'
+                remark = 'LX TIMEOUT'
+            else:
+                side = 'BUY'
+                remark = 'SX TIMEOUT'
+            self.place_order(side=side, qty=self.inv_algo, remark=remark, index=index)
             return
         else:
             # run indicators
