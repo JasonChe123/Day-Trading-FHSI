@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 import threading as th
+import yaml
 
 # PROJECT MODULES ---------------------------------------------------------------------------------
 from library.futu_api import FutuApi
@@ -71,51 +72,39 @@ class AlgoTradeForFHSI(App):
         self.ibapi.request_market_data()
 
 
-def get_system_arguments():
-    # get system arguments
-    sys_params = dict()
-    for key, value in ((key.lstrip('-'), value) for key, value, in (a.split('=') for a in sys.argv[1:])):
-        sys_params[key] = value
+def get_system_params():
+    # check if file valid
+    if os.path.isfile('start_up_params.yaml'):
+        with open('start_up_params.yaml', 'r') as file_:
+            params = yaml.safe_load(file_)
 
-    # update required arguments
-    required_params = {
-        'futu_pwd': '0',
-        'ib_username': '',
-        'ib_pwd': '',
-        'demo': 'true',
-        'strategy': '',
-    }
-    required_params.update(sys_params)
+            # check if all required params is in the file
+            required_params = {'futu_unlock_trade_pwd', 'ib_username', 'ib_login_pwd', 'demo', 'strategy'}
+            if required_params.difference(params):
+                raise KeyError(f"Please add {list(required_params.difference(params))} in 'start_up_params.yaml'.")
 
-    # check validity
-    if required_params['futu_pwd'] == 0:
-        raise Exception("Please input 'futu_pwd'=******.")
+            # check value validity
+            if not isinstance(params.get('futu_unlock_trade_pwd'), int):
+                raise ValueError("futu_pwd should be numeric.")
 
-    if not required_params['futu_pwd'].isnumeric():
-        raise Exception("futu_pwd should be numeric.")
+            if not isinstance(params.get('demo'), bool):
+                raise ValueError("demo should be 'True/False'.")
+    else:
+        raise FileNotFoundError("Please add 'start_up_params.yaml' in the main project directory.")
 
-    if not required_params['ib_username']:
-        raise Exception("Please input 'ib_username=******.")
-
-    if not required_params['ib_pwd']:
-        raise Exception("Please input 'ib_pwd=******")
-
-    if required_params['demo'].lower() not in ['true', 'false']:
-        raise Exception("Please input true/false for 'demo' parameter.")
-
-    return required_params
+    return params
 
 
 if __name__ == '__main__':
     PROJECT_DIR = os.getcwd()
-    sys_params = get_system_arguments()
+    sys_params = get_system_params()
 
     # get system params
-    FUTU_UNLOCK_TRADE_PASSWORD = int(sys_params['futu_pwd'])
+    FUTU_UNLOCK_TRADE_PASSWORD = int(sys_params['futu_unlock_trade_pwd'])
     IB_TWS_USER_NAME = sys_params['ib_username']
-    IB_TWS_LOGIN_PWD = sys_params['ib_pwd']
-    IS_DEMO = True if sys_params['demo'].lower() == 'true' else False
-    RUNNING_STRATEGIES = sys_params['strategy'].split(',')
+    IB_TWS_LOGIN_PWD = sys_params['ib_login_pwd']
+    IS_DEMO = sys_params['demo']
+    RUNNING_STRATEGIES = sys_params['strategy']
 
     # configure logging
     config_logging(IS_DEMO, PROJECT_DIR)
