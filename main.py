@@ -1,8 +1,7 @@
 # SYSTEM MODULES ----------------------------------------------------------------------------------
-from collections import defaultdict
+import datetime as dt
 import logging
 import os
-import sys
 import threading as th
 import yaml
 
@@ -48,6 +47,7 @@ class AlgoTradeForFHSI(App):
         self.connect_brokers()
         self.algo_main_page.algo_trade.load_strategies()
         self.algo_main_page.algo_trade.update_table()
+        self.update_strategy_params()
         self.algo_main_page.trade_journal.init_filter()
         self.algo_main_page.trade_journal.refresh()
 
@@ -58,8 +58,46 @@ class AlgoTradeForFHSI(App):
     # ------------------------------------------------------------------------------------------- #
     """ strategy callback """
     # ------------------------------------------------------------------------------------------- #
-    def callback(self):
-        pass
+    def fire_trade(self, side: str, qty: int, remark: str, order_type: str):
+        self.futu.fire_trade(side, qty, remark, order_type)
+        self.update_gui()
+        self.update_strategy_params()
+
+    def update_strategy_params(self):
+
+        def get_last_open_position_price_and_time(strategy):
+            trade_journal = self.futu.filter_trade_journal(
+                self.futu.get_trade_journal(),
+                self.algo_main_page.algo_trade.start_date,
+                self.algo_main_page.algo_trade.end_date
+            )
+
+            for i in trade_journal.index:
+                # todo: review logic: the last trade can be a partial closing trade, not the latest open trade
+                if trade_journal['remark'][i][:3] == strategy.name:
+                    return trade_journal['price'][i], trade_journal['create_time'][i]
+
+        algo_table = self.algo_main_page.algo_trade.algo_table
+        if not algo_table.empty:
+            for i in algo_table.index:
+                strategy = self.algo_main_page.algo_trade.strategies[algo_table['Strategy'][i]]
+                inventory = algo_table['Inventory'][i]
+                realized_pnl = algo_table['P / L'][i]  # todo
+                average_price = algo_table['AvgPrice'][i]
+                traded_vol = algo_table['TradedQty'][i]
+                if not inventory:
+                    last_entry_price = int
+                    last_entry_time = dt.datetime
+                else:
+                    last_entry_price, last_entry_time = get_last_open_position_price_and_time(strategy)
+
+                strategy.update_params(inventory, realized_pnl, average_price, traded_vol, last_entry_price, last_entry_time)
+
+    def update_gui(self):
+        self.algo_main_page.algo_trade.update_table()
+        self.algo_main_page.trade_journal.refresh()
+        # Clock.schedule_once(lambda time_: self.algo_main_page.algo_trade.update_table(), 0)
+        # Clock.schedule_once(lambda time_: self.algo_main_page.trade_journal.refresh(), 0)
 
     # ------------------------------------------------------------------------------------------- #
     """ helper methods """

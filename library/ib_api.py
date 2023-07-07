@@ -15,6 +15,7 @@ from ibapi.contract import Contract
 
 os.environ['KIVY_LOG_MODE'] = 'MIXED'
 from kivy.app import App
+from kivy.clock import Clock
 
 
 class IBApi(EWrapper, EClient):
@@ -87,7 +88,7 @@ class IBApi(EWrapper, EClient):
 
     def historicalDataUpdate(self, reqId: int, bar: BarData):
         if reqId == self.request_id.get('FHSI_1M'):
-            self.update_kline(bar)
+            Clock.schedule_once(lambda time_: self.update_kline(bar), 0)
 
     def tickPrice(self, reqId: TickerId , tickType: TickType, price: float, attrib: TickAttrib):
         if reqId == self.request_id.get('FHSI_1M') and tickType == 4:  # last price at which the contract traded

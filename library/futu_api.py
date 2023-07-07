@@ -114,7 +114,7 @@ class FutuApi:
             ret_code, ret_data = self.qot_ctx.get_order_book(self.contract_detail.get('full_code'), 1)
             if ret_code != ft.RET_OK:
                 logging.warning(ret_data)
-                bid_price, ask_price = 20000, 20002
+                bid_price, ask_price = 20000, 20002  # sample price for running
             else:
                 bid_price, ask_price = ret_data['Bid'][0][0], ret_data['Ask'][0][0]
 
@@ -123,8 +123,8 @@ class FutuApi:
             create_time = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
             # update order history and deal history
-            self.update_demo_order_history(create_time, side, qty, exec_price, remark, order_type)
-            self.update_demo_trade_deal_history(create_time, side, qty, exec_price)
+            self.update_demo_order_history(create_time, side, abs(qty), exec_price, remark, order_type)
+            self.update_demo_trade_deal_history(create_time, side, abs(qty), exec_price)
 
             # for separate order
             if separate_qty:
@@ -295,6 +295,7 @@ class FutuApi:
             algo_table.loc[new_index] = pd.Series()
             algo_table.fillna(0, inplace=True)
             position, avg_price, trade_vol, fees, pnl_value = self.calculate_trading_data(trade_data)
+            # todo: position should be flipped if in reverse mode
             algo_table.at[new_index, 'Strategy'] = strategy_name
             algo_table.at[new_index, 'Inventory'] = position
             algo_table.at[new_index, 'AvgPrice'] = avg_price

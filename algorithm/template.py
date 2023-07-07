@@ -30,8 +30,8 @@ class AlgoTemplate:
         # algo params
         self.max_contract = 3
         self.exec_set = 1
-        self.first_entry_price = None
-        self.latest_entry_time = None
+        self.last_entry_price = 0
+        self.last_entry_time = dt.datetime(1900, 1, 1, 0, 0, 0)
 
         # operating params
         self.is_turn_on = True
@@ -93,6 +93,9 @@ class AlgoTemplate:
                 self.main_app.fire_trade(side, qty, f'{self.name}-{remark}', order_type)
                 th.Timer(1, self._reset_can_trade).start()
 
+        # self.main_app.update_gui()
+        # self.main_app.update_strategy_params()
+
     def _reset_can_trade(self):
         self._can_trade = True
 
@@ -112,23 +115,18 @@ class AlgoTemplate:
         self._order_num += 1
         return order_id
 
-    def update_params(self, side: str, qty: int, price: int):
-        # update self.first_entry_price
-        if self.inv_algo == 0:
-            self.first_entry_price = price
-
+    def update_params(self, inventory, pnl, average_price, traded_vol, last_entry_price, last_entry_time):
+        """
+        only used for demo order
+        """
         # update inventory
-        if side == 'BUY':
-            self.inv_real += qty
-        elif side == 'SELL':
-            self.inv_real -= qty
-        self.inv_algo = self.inv_real if self.mode == 'normal' else -self.inv_real
-
-        # update average price
-        if self.inv_algo == 0:
-            self.avg_price = 0
-        else:
-            self.avg_price = (self.avg_price * self.inv_algo + price * qty) / (self.inv_algo + qty)
+        self.inv_real = inventory
+        self.inv_algo = -self.inv_real if self.mode == 'reverse' else self.inv_real
+        self.pnl_value = pnl
+        self.avg_price = average_price
+        self.trd_vol = traded_vol
+        self.last_entry_price = last_entry_price
+        self.last_entry_time = last_entry_time
 
     @staticmethod
     def cross_over(value1: pd.Series, value2: pd.Series | float):

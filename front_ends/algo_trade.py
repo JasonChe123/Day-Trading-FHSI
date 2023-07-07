@@ -142,8 +142,6 @@ class AlgoTrade(Widget):
             strategy = self.strategies.get(row['Strategy'])
             for col in self.algo_table.columns:  # looping for column <----------
                 # reset params
-                color = (1.0, 1.0, 1.0, 1.0)
-                halign = 'center'
                 label = Label(markup=True, font_size=18, text_size=(col_width, row_height),
                               size=(col_width, row_height), size_hint=(None, None), valign='middle')
                 value = row[col]
@@ -203,7 +201,7 @@ class AlgoTrade(Widget):
 
                 # update label
                 label = self.ids['data_table'].ids[f'{strategy_name}_PL']  # get label widget
-                label.color = (0, 1, 0, 1) if realtime_pnl >= 0 else (1, 0, 0, 1)
+                label.color = self.color_map.get('green') if realtime_pnl >= 0 else self.color_map.get('red')
                 text = '{:,.0f}'.format(realtime_pnl)
                 label.text = f'[b]{text}[/b]' if realtime_pnl < 0 else f'[b]{"+"+text}[/b]'
 
@@ -257,8 +255,7 @@ class AlgoTrade(Widget):
             case _:
                 return
 
-        self.main_app.futu.fire_trade(side=side, qty=qty, remark='-'.join([strategy.name, remark]))
-        self.refresh()
+        self.main_app.fire_trade(side=side, qty=qty, remark='-'.join([strategy.name, remark]), order_type='MARKET')
 
     # ------------------------------------------------------------------------------------------- #
     """ helper methods """
