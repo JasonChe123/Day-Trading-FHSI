@@ -27,29 +27,31 @@ def launch_futu_opend(project_dir):
 
 def launch_tws(project_dir, user_name: str, password: str):
     # check host
-    server_address = '192.168.1.101'
-    if socket.gethostbyname(socket.gethostname()) != server_address:
-        logging.debug("This is not a server, please make sure IB TWS is running and accepted this connection.")
+    testing_machine = 'linux'
+    if sys.platform == testing_machine:
+        logging.info("This is a testing Linux, plesae launch tws manually.")
         return
 
     # delete 'setup' file in order not to affected by the size of the TWS app
-    file_path = r'c:\Jts\jts.ini'
+    file_path = os.path.join(project_dir, 'ib_tws', 'Jts', 'jts.ini')
     if os.path.isfile(file_path):
         logging.debug("Deleting setup file...")
         os.remove(file_path)
 
     # launch TWS
-    subprocess.Popen([r'C:\Jts\tws.exe',
+    tws = 'tws' if sys.platform == 'linux' else 'tws.exe'
+    subprocess.Popen([os.path.join(project_dir, 'ib_tws', 'Jts', tws),
                       f'username={user_name}',
                       f'password={password}',
-                      'enter-readonly=True'])
+                      'enter-readonly=True']
+                     )
     logging.info("Allow 60 seconds for TWS startup...")
-    time.sleep(60)
+    time.sleep(10)
 
     # search 2-factors authentication
     img_path = os.path.join(project_dir, 'library', 'images', 'ib_2_factors_authentication.png')
     while True:
-        element = search_image_on_screen(img_path, confidence=0.95, grayscale=True)
+        element = search_image_on_screen(img_path, confidence=0.9, grayscale=True)
         if element:
             break
         logging.info("IB TWS 2 factors authentication not found, try again after 5 seconds.")

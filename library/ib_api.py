@@ -52,9 +52,8 @@ class IBApi(EWrapper, EClient):
         self.contract.currency = 'HKD'
         self.contract.localSymbol = ''.join(['HSI', month_key[int(contract_month)], contract_year[-1]])  # e.g. HSIH3: FHSI April 2023
 
-    def init_connection(self):
-        server_address = '192.168.1.101' if socket.gethostbyname(socket.gethostname()) != '192.168.1.101' else '127.0.0.1'
-        self.connect(server_address, 7497, self.client_id)
+    def init_connection(self, tws_address):
+        self.connect(tws_address, 7497, self.client_id)
         th.Thread(target=self.run, args=[]).start()
 
     def request_market_data(self):

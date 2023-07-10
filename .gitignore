@@ -5,6 +5,7 @@ database/trade_journal/*
 front_ends/__pycache__/
 library/__pycache__/
 futu_openD/*
+ib_tws/Jts/*
 venv/
 __pycache__/
 .git/

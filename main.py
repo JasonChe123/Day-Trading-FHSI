@@ -106,7 +106,7 @@ class AlgoTradeForFHSI(App):
         self.futu = FutuApi()
         self.ibapi = IBApi()
         self.futu.connect(unlock_trade_password=FUTU_UNLOCK_TRADE_PASSWORD)
-        self.ibapi.init_connection()
+        self.ibapi.init_connection(IB_TWS_ADDRESS)
         self.ibapi.request_market_data()
 
 
@@ -117,7 +117,7 @@ def get_system_params():
             params = yaml.safe_load(file_)
 
             # check if all required params is in the file
-            required_params = {'futu_unlock_trade_pwd', 'ib_username', 'ib_login_pwd', 'demo', 'strategy'}
+            required_params = {'futu_unlock_trade_pwd', 'ib_username', 'ib_login_pwd', 'demo', 'strategy', 'ib_tws_address'}
             if required_params.difference(params):
                 raise KeyError(f"Please add {list(required_params.difference(params))} in 'start_up_params.yaml'.")
 
@@ -139,6 +139,7 @@ if __name__ == '__main__':
 
     # get system params
     FUTU_UNLOCK_TRADE_PASSWORD = int(sys_params['futu_unlock_trade_pwd'])
+    IB_TWS_ADDRESS = sys_params['ib_tws_address']
     IB_TWS_USER_NAME = sys_params['ib_username']
     IB_TWS_LOGIN_PWD = sys_params['ib_login_pwd']
     IS_DEMO = sys_params['demo']
@@ -157,7 +158,7 @@ if __name__ == '__main__':
     kv_files.sort()
     [Builder.load_file(os.path.join(kv_dir, kv_file)) for kv_file in kv_files]
 
-    # build gui
+    # launch app
     Window.size = (450, 800)
     app = AlgoTradeForFHSI()
 
