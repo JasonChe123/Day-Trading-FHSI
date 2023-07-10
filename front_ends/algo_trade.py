@@ -211,6 +211,12 @@ class AlgoTrade(Widget):
         label.text = text
         label.color = color
 
+    def update_realtime_OHLC(self, o, h, l, c):
+        self.ids['open'].text = '{:,.0f}'.format(o)
+        self.ids['high'].text = '{:,.0f}'.format(h)
+        self.ids['low'].text = '{:,.0f}'.format(l)
+        self.ids['close'].text = '{:,.0f}'.format(c)
+
     # ------------------------------------------------------------------------------------------- #
     """ button's callback """
     # ------------------------------------------------------------------------------------------- #

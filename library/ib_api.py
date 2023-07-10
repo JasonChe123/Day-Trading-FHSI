@@ -89,6 +89,8 @@ class IBApi(EWrapper, EClient):
     def historicalDataUpdate(self, reqId: int, bar: BarData):
         if reqId == self.request_id.get('FHSI_1M'):
             Clock.schedule_once(lambda time_: self.update_kline(bar), 0)
+        elif reqId == self.request_id.get('FHSI_1D'):
+            self.algo.update_realtime_OHLC(bar.open, bar.high, bar.low, bar.close)
 
     def tickPrice(self, reqId: TickerId , tickType: TickType, price: float, attrib: TickAttrib):
         if reqId == self.request_id.get('FHSI_1M') and tickType == 4:  # last price at which the contract traded
