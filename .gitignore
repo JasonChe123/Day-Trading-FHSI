@@ -6,6 +6,7 @@ front_ends/__pycache__/
 library/__pycache__/
 futu_openD/*
 ib_tws/Jts/*
+backtesting/report/*
 venv/
 __pycache__/
 .git/

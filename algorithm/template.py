@@ -12,16 +12,21 @@ class AlgoTemplate:
     # ------------------------------------------------------------------------------------------- #
     """ initialization """
     # ------------------------------------------------------------------------------------------- #
-    def __init__(self, main_app: type, symbol: str, start: dt.time, open_order_start: dt.time,
-                 open_order_end: dt.time, timeout: dt.time):
+    def __init__(self,
+                 main_app,
+                 symbol: str,
+                 start: dt.time=dt.time(9, 15),
+                 open_order_start: dt.time=dt.time(9, 15),
+                 open_order_end: dt.time=dt.time(2, 58),
+                 timeout: dt.time=dt.time(2, 58)):
         """
         basic setting for algo trade strategy
         :param main_app: driven by apps like backtest , real-trading
         :param symbol:
-        :param start:
+        :param start: algo running time
         :param open_order_start:
         :param open_order_end:
-        :param timeout:
+        :param timeout:algo timeout time
         """
         self.main_app = main_app
         self.kline = pd.DataFrame()
@@ -30,6 +35,7 @@ class AlgoTemplate:
         # algo params
         self.max_contract = 3
         self.exec_set = 1
+        self.first_entry_price = 0
         self.last_entry_price = 0
         self.last_entry_time = dt.datetime(1900, 1, 1, 0, 0, 0)
 
@@ -115,7 +121,7 @@ class AlgoTemplate:
         self._order_num += 1
         return order_id
 
-    def update_params(self, inventory, pnl, average_price, traded_vol, last_entry_price, last_entry_time):
+    def update_params(self, inventory=0, pnl=0, average_price=0, traded_vol=0, last_entry_price=0, last_entry_time=0):
         """
         only used for demo order
         """
@@ -127,6 +133,23 @@ class AlgoTemplate:
         self.trd_vol = traded_vol
         self.last_entry_price = last_entry_price
         self.last_entry_time = last_entry_time
+
+    def update_backtest_params(self, side: str, qty: int, price: int):
+        if self.inv_algo == 0:
+            self.first_entry_price = price
+
+        # update inventory
+        if side == 'BUY':
+            self.inv_real += qty
+        elif side == 'SELL':
+            self.inv_real -= qty
+        self.inv_algo = self.inv_real if self.mode == 'normal' else -self.inv_real
+
+        # update average price
+        if self.inv_algo == 0:
+            self.avg_price = 0
+        else:
+            self.avg_price = (self.avg_price * self.inv_algo + price * qty) / (self.inv_algo + qty)
 
     @staticmethod
     def cross_over(value1: pd.Series, value2: pd.Series | float):
