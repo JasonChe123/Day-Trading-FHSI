@@ -1,0 +1,7 @@
+Multicharts
+Quote Manager
+->Select Instrument
+->Edit
+->Edit Data
+->Click "Load" Button
+->Click "Copy" Button
