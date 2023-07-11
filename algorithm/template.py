@@ -252,7 +252,16 @@ class AlgoTemplate:
             # todo: check can_open_order
             self.check_entry_conditions(kline=kline, index=index)
         else:
-            self.check_is_timeout(kline, index)
+            if self.check_is_timeout(kline, index):
+                if self.inv_algo > 0:
+                    side = 'SELL'
+                    remark = 'LX TIMEOUT'
+                else:
+                    side = 'BUY'
+                    remark = 'SX TIMEOUT'
+                self.place_order(side=side, qty=self.inv_algo, remark=remark, index=index)
+                return
+
             self.check_exit_conditions(kline, index=index)
             self.check_add_order_conditions(kline, index=index)
         # else:
@@ -269,7 +278,7 @@ class AlgoTemplate:
 
         time_key = self.kline['time_key'].iloc[index]
         if self.algo_timeout_time.hour > 3:
-            if self.algo_timeout_time <= time_key.time() or time_key.hour <= 3:
+            if self.algo_timeout_time <= time_key.time() or time_key.hour >= 3:
                 return set_timeout(True)
 
         elif self.algo_timeout_time <= time_key.time() and time_key.hour <= 3:

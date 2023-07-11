@@ -102,7 +102,7 @@ class BackTestEngine:
             :return: None
             """
             i = df.index[-1]
-            df.loc[i, 'Profit/Loss'] = pnl*self.point_value - (self.slippage + self.commission)*trd_qty*self.point_value
+            df.loc[i, 'Profit/Loss'] = int(pnl*self.point_value - (self.slippage + self.commission)*trd_qty*self.point_value)
             df.loc[i, 'Traded Qty'] = trd_qty
             df.loc[i, 'Commission'] = int(self.commission*trd_qty*self.point_value)
             df.loc[i, 'Slippage'] = self.slippage*trd_qty*self.point_value
@@ -258,14 +258,14 @@ def backtest(strategy: MAL, data_from: dt.datetime, data_to: dt.datetime):
     chart.export_chart(
         file_name=f'backtest_{back_test.strategy.name}_{data_from.strftime("%y%m")}_to_{data_to.strftime("%y%m")}.html')
 
-    print(f"Backtesting {strategy.name} from {data_from} to {data_to} finished.")
+    print(f"Backtesting {strategy.name} from {data_from.strftime('%Y-%m-%d')} to {data_to.strftime('%Y-%m-%d')} finished.")
 
 
 def get_backtest_result() -> (pd.DataFrame, pd.DataFrame):
     """
-        get trades and report from multiprocessing
-        :return: trades, report
-        """
+    get trades and report from multiprocessing
+    :return: trades, report
+    """
     trades, report = pd.DataFrame(), pd.DataFrame()
     trade_count = report_count = 0
 
@@ -288,7 +288,7 @@ def get_backtest_result() -> (pd.DataFrame, pd.DataFrame):
     trades.sort_values('time_key', inplace=True, ignore_index=True)
     report['sort_value'] = report.apply(lambda col: dt.datetime.strptime(col['Period'], '%Y-%b'), axis=1)
     report.sort_values('sort_value', inplace=True, ignore_index=True)
-    report.drop(columns=['sort_value'], inplace=True)
+    report.drop(columns=['sort_value', 'time_key', 'side', 'qty', 'price', 'remark', 'cost_price'], inplace=True)
     report.loc['Total'] = report.sum(numeric_only=True)
 
     return trades, report
@@ -482,7 +482,7 @@ if __name__ == '__main__':
 
     # generate detail report
     detail_report, line_chart = generate_detail_report(
-        os.path.join(PROJECT_DIR, 'backtesting', 'report', 'trade_history.csv')
+        os.path.join(REPORT_DIR, 'trade_history.csv')
     )
 
     # overview
@@ -495,6 +495,6 @@ if __name__ == '__main__':
     line_chart.add_monthly_report(monthly_report)
     line_chart.add_yearly_report(yearly_report)
     line_chart.add_overview_text(report_overview)
-    line_chart.export_chart(path=os.path.join(PROJECT_DIR, 'backtesting', 'report', 'equity_curve.html'))
+    line_chart.export_chart(path=os.path.join(REPORT_DIR, 'equity_curve.html'))
 
     print(f"\nFinished, {round(time.time() - start_, 2)} seconds used.")
