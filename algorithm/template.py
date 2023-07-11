@@ -279,7 +279,7 @@ class AlgoTemplate:
 
         time_key = self.kline['time_key'].iloc[index]
         if self.algo_timeout_time.hour > 3:
-            if self.algo_timeout_time <= time_key.time() or time_key.hour >= 3:
+            if self.algo_timeout_time <= time_key.time() or time_key.hour <= 3:
                 return set_timeout(True)
 
         elif self.algo_timeout_time <= time_key.time() and time_key.hour <= 3:
