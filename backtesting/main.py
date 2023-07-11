@@ -128,7 +128,7 @@ class BackTestEngine:
             # generating report
             for i, row in df.iterrows():
                 # new month
-                if row['time_key'].month != curr_month:
+                if row['time_key'].month != curr_month and row['time_key'].hour > 3:
                     curr_month = row['time_key'].month
                     write_to_report(df_report, pnl, trd_qty)
                     df_report.loc[len(df_report)] = new_row  # add new row
@@ -269,7 +269,7 @@ def get_backtest_result() -> (pd.DataFrame, pd.DataFrame):
     trades, report = pd.DataFrame(), pd.DataFrame()
     trade_count = report_count = 0
 
-    # get trades and report from queue
+    # get trades and report from QUEUE
     while True:
         if TRADES_QUEUE.qsize() != 0:
             trades = pd.concat([trades, TRADES_QUEUE.get()], axis=0, ignore_index=True)
