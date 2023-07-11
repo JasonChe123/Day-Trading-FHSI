@@ -445,7 +445,7 @@ if __name__ == '__main__':
     PROJECT_DIR = os.path.split(os.getcwd())[0]
     REPORT_DIR = os.path.join(PROJECT_DIR, 'backtesting', 'report')
     START_MONTH = dt.datetime(2019, 1, 1)
-    END_MONTH = dt.datetime(2023, 7, 1) - dt.timedelta(days=1)
+    END_MONTH = dt.datetime(2023, 2, 1) - dt.timedelta(days=1)
     FEES, SLIPPAGE, POINT_VALUE = 12, 30, 10
     REPORT_QUEUE = mp.Queue()
     TRADES_QUEUE = mp.Queue()

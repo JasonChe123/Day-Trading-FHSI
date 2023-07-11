@@ -14,11 +14,11 @@ class AlgoTemplate:
     # ------------------------------------------------------------------------------------------- #
     def __init__(self,
                  main_app,
-                 symbol: str,
-                 start: dt.time=dt.time(9, 15),
-                 open_order_start: dt.time=dt.time(9, 15),
-                 open_order_end: dt.time=dt.time(2, 58),
-                 timeout: dt.time=dt.time(2, 58)):
+                 symbol:            str,
+                 start:             dt.time = dt.time(9, 15),
+                 open_order_start:  dt.time = dt.time(9, 15),
+                 open_order_end:    dt.time = dt.time(2, 58),
+                 timeout:           dt.time = dt.time(2, 58)):
         """
         basic setting for algo trade strategy
         :param main_app: driven by apps like backtest , real-trading
@@ -106,8 +106,9 @@ class AlgoTemplate:
         self._can_trade = True
 
     def update_status(self, status: str):
-        self.status = status
-        self.main_app.algo_main_page.algo_trade.update_status(self.name, status)
+        pass
+        # self.status = status
+        # self.main_app.algo_main_page.algo_trade.update_status(self.name, status)
 
     # ------------------------------------------------------------------------------------------- #
     """ helper methods """
@@ -248,24 +249,24 @@ class AlgoTemplate:
                 self.check_entry_conditions(kline)
 
     def backtest_in_out_logic(self, kline: pd.DataFrame, index: int):
-        if self.inv_algo == 0:
-            # todo: check can_open_order
+        if self.inv_algo == 0 and self._check_can_open_order(kline, index):
             self.check_entry_conditions(kline=kline, index=index)
         else:
             if self.check_is_timeout(kline, index):
                 if self.inv_algo > 0:
                     side = 'SELL'
                     remark = 'LX TIMEOUT'
-                else:
+                elif self.inv_algo < 0:
                     side = 'BUY'
                     remark = 'SX TIMEOUT'
+                else:
+                    return
+
                 self.place_order(side=side, qty=self.inv_algo, remark=remark, index=index)
                 return
 
             self.check_exit_conditions(kline, index=index)
             self.check_add_order_conditions(kline, index=index)
-        # else:
-        #     self.check_entry_conditions(kline, index=index)
 
     def check_is_timeout(self, kline: pd.DataFrame, index: int = 0):
         """return True if algo timeout"""
@@ -295,26 +296,29 @@ class AlgoTemplate:
 
         return set_timeout(False)
 
-    def _check_can_open_order(self, kline: pd.DataFrame):
+    def _check_can_open_order(self, kline: pd.DataFrame, index=0):
         """`
         check for open order time
         return True if time_key within open order period
         """
         def set_can_open_order(flag: bool):
             self.can_open_order = flag
-            status = 'timeout' if not flag and not self.inv_algo else 'running'
-            self.update_status(status)
+            # status = 'timeout' if not flag and not self.inv_algo else 'running'
+            # self.update_status(status)
 
             return flag
 
-        time_key = kline['time_key'].iloc[-1].time()
+        if self.main_app.engine == 'live':
+            index = self.kline.index[-1]  # get index
+
+        time_key = self.kline['time_key'].iloc[index]
         if self.open_order_end_time.hour > 3:
-            if self.open_order_start_time < time_key < self.open_order_end_time:
+            if self.open_order_start_time < time_key.time() < self.open_order_end_time:
                 return set_can_open_order(True)
             else:
                 return set_can_open_order(False)
         else:
-            if self.open_order_start_time < time_key or time_key < self.open_order_end_time:
+            if self.open_order_start_time < time_key.time() or time_key.time() < self.open_order_end_time:
                 return set_can_open_order(True)
             else:
                 return set_can_open_order(False)
