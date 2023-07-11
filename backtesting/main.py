@@ -288,7 +288,7 @@ def get_backtest_result() -> (pd.DataFrame, pd.DataFrame):
     trades.sort_values('time_key', inplace=True, ignore_index=True)
     report['sort_value'] = report.apply(lambda col: dt.datetime.strptime(col['Period'], '%Y-%b'), axis=1)
     report.sort_values('sort_value', inplace=True, ignore_index=True)
-    report.drop(columns=['sort_value', 'time_key', 'side', 'qty', 'price', 'remark', 'cost_price'], inplace=True)
+    report.drop(columns=['sort_value'], inplace=True)
     report.loc['Total'] = report.sum(numeric_only=True)
 
     return trades, report
@@ -445,7 +445,7 @@ if __name__ == '__main__':
     PROJECT_DIR = os.path.split(os.getcwd())[0]
     REPORT_DIR = os.path.join(PROJECT_DIR, 'backtesting', 'report')
     START_MONTH = dt.datetime(2019, 1, 1)
-    END_MONTH = dt.datetime(2023, 2, 1) - dt.timedelta(days=1)
+    END_MONTH = dt.datetime(2023, 7, 1) - dt.timedelta(days=1)
     FEES, SLIPPAGE, POINT_VALUE = 12, 30, 10
     REPORT_QUEUE = mp.Queue()
     TRADES_QUEUE = mp.Queue()
