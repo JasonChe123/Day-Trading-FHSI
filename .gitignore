@@ -14,3 +14,4 @@ __pycache__/
 algo_trade.cpython-311.pyc
 algo_trade_main_page.cpython-311.pyc
 start_up_params.yaml
+backtesting/optimizer.py
