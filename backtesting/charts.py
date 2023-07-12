@@ -297,16 +297,13 @@ class LineChart:
             self.recovery_from = max(recovery_time)[1]
             self.recovery_to = max(recovery_time)[2]
         elif len(recovery_time) == 1:
-            self.recovery_time = recovery_time[0].days
-            self.recovery_from = recovery_time[1].days
-            self.recovery_to = recovery_time[2].days
+            self.recovery_time = recovery_time[0][0].days
+            self.recovery_from = recovery_time[0][1]
+            self.recovery_to = recovery_time[0][2]
         else:
             self.recovery_time = 0
             self.recovery_from = 0
             self.recovery_to = 0
-        # self.recovery_time = max(recovery_time)[0].days  # only 1 data in recovery, keep losing and no winning
-        # self.recovery_from = max(recovery_time)[1]
-        # self.recovery_to = max(recovery_time)[2]
 
         return new_high_dots
 
