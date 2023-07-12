@@ -311,7 +311,7 @@ def generate_detail_report(path_: os.path) -> pd.DataFrame | type:
     df['accu_pnl'] = 0
     pnl = accu_pnl = 0
     for i, row in df.iterrows():
-        amount = row['cost_price'] * 10 - row['slippage'] - row['fees']
+        amount = row['cost_price'] * POINT_VALUE - row['slippage'] - row['fees']
         accu_pnl += amount
         if row['side'] == 'SELL':
             pnl += amount
@@ -447,6 +447,7 @@ if __name__ == '__main__':
     START_MONTH = dt.datetime(2019, 1, 1)
     END_MONTH = dt.datetime(2023, 7, 1) - dt.timedelta(days=1)
     FEES, SLIPPAGE, POINT_VALUE = 12, 30, 10
+    # FEES, SLIPPAGE, POINT_VALUE = 30, 20, 50
     REPORT_QUEUE = mp.Queue()
     TRADES_QUEUE = mp.Queue()
     PROCESS = []
