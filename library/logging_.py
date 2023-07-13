@@ -58,3 +58,7 @@ def config_logging(is_demo: bool, proj_dir: os.path):
     # add handler
     mylogger.addHandler(file_handler)
     mylogger.addHandler(stream_handler)
+
+
+
+print()
