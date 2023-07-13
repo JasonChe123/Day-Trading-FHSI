@@ -26,25 +26,27 @@ def launch_futu_opend(project_dir):
 
 
 def launch_tws(project_dir, user_name: str, password: str):
-    # check host
-    testing_machine = 'linux'
-    if sys.platform == testing_machine:
-        logging.info("This is a testing Linux, plesae launch tws manually.")
+    if is_running(programme_name='tws'):
+        logging.critical(f"TWS is already run.")
         return
 
-    # delete 'setup' file in order not to affected by the size of the TWS app
-    file_path = os.path.join(project_dir, 'ib_tws', 'Jts', 'jts.ini')
-    if os.path.isfile(file_path):
+    # define path
+    if sys.platform == 'win32':
+        tws_path = r'C:\Jts\tws.exe'
+        init_file = r'C:\Jts\jts.ini'
+    elif sys.platform == 'linux':
+        tws_path = os.path.join(project_dir, 'ib_tws', 'Jts', 'tws')
+        init_file = os.path.join(project_dir, 'ib_tws', 'Jts', 'jts.ini')
+    else:
+        raise RuntimeError(f"This OS is {sys.platform}, please check the TWS file location.")
+
+    # remove the initial setup file
+    if os.path.isfile(init_file):
         logging.debug("Deleting setup file...")
-        os.remove(file_path)
+        os.remove(init_file)
 
     # launch TWS
-    tws = 'tws' if sys.platform == 'linux' else 'tws.exe'
-    subprocess.Popen([os.path.join(project_dir, 'ib_tws', 'Jts', tws),
-                      f'username={user_name}',
-                      f'password={password}',
-                      'enter-readonly=True']
-                     )
+    subprocess.Popen([tws_path, f'username={user_name}', f'password={password}', f'enter-readonly={True}'])
     logging.info("Allow 60 seconds for TWS startup...")
     time.sleep(10)
 

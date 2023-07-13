@@ -251,7 +251,7 @@ class AlgoTemplate:
     def backtest_in_out_logic(self, kline: pd.DataFrame, index: int):
         if self.inv_algo == 0 and self._check_can_open_order(kline, index):
             self.check_entry_conditions(kline=kline, index=index)
-        else:
+        elif self.inv_algo:
             if self.check_is_timeout(kline, index):
                 if self.inv_algo > 0:
                     side = 'SELL'

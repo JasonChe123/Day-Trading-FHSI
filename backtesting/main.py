@@ -288,7 +288,8 @@ def get_backtest_result() -> (pd.DataFrame, pd.DataFrame):
     trades.sort_values('time_key', inplace=True, ignore_index=True)
     report['sort_value'] = report.apply(lambda col: dt.datetime.strptime(col['Period'], '%Y-%b'), axis=1)
     report.sort_values('sort_value', inplace=True, ignore_index=True)
-    report.drop(columns=['sort_value'], inplace=True)
+    # report.drop(columns=['sort_value'], inplace=True)
+    report.drop(columns=['sort_value', 'time_key', 'side', 'qty', 'price', 'remark', 'cost_price'], inplace=True)
     report.loc['Total'] = report.sum(numeric_only=True)
 
     return trades, report
