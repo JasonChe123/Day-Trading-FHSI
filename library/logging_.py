@@ -32,11 +32,11 @@ def config_logging(is_demo: bool, proj_dir: os.path):
     os.environ['KIVY_LOG_MODE'] = 'MIXED'  # [KIVY, PYTHON, MIXED]
 
     # set kivy loglevel
-    Logger.setLevel(logging.WARNING)
+    Logger.setLevel(logging.INFO)
 
     # set system loglevel
     mylogger = logging.getLogger('root')
-    mylogger.setLevel(logging.WARNING)  # todo: turn it to INFO while finish testing
+    mylogger.setLevel(logging.INFO)  # todo: turn it to INFO while finish testing
 
     # define log file path
     file_name = 'demo.log' if is_demo else 'live.log'
