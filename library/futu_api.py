@@ -181,8 +181,10 @@ class FutuApi:
         """
         Callback from trade_journal 'refresh' button
         """
-        if not trade_journal.empty:
-            trade_journal = self.filter_trade_journal(self.get_trade_journal(), start_date, end_date)
+        if trade_journal.empty:
+            trade_journal = self.get_trade_journal()
+            if not trade_journal.empty:
+                trade_journal = self.filter_trade_journal(self.get_trade_journal(), start_date, end_date)
 
         return trade_journal
 
