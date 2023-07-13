@@ -46,7 +46,7 @@ def launch_tws(project_dir, user_name: str, password: str):
         os.remove(init_file)
 
     # launch TWS
-    subprocess.Popen([tws_path, f'username={user_name}', f'password={password}', f'enter-readonly={True}'])
+    subprocess.Popen([tws_path, f'username={user_name}', f'password={password}', 'enter-readonly=true'])
     logging.info("Allow 60 seconds for TWS startup...")
     time.sleep(10)
 
@@ -57,7 +57,20 @@ def launch_tws(project_dir, user_name: str, password: str):
         if element:
             break
         logging.info("IB TWS 2 factors authentication not found, try again after 5 seconds.")
+        print("IB TWS 2 factors authentication not found, try again after 5 seconds.")
         time.sleep(5)
+
+    # simulate clicking event
+    left, top, width, height = element
+    auto_gui.moveTo((left, top), duration=0.2, tween=auto_gui.easeInOutQuad)
+    auto_gui.moveTo((left + width, top), duration=0.2, tween=auto_gui.easeInOutQuad)
+    auto_gui.moveTo((left + width, top + height), duration=0.2, tween=auto_gui.easeInOutQuad)
+    auto_gui.moveTo((left, top + height), duration=0.2, tween=auto_gui.easeInOutQuad)
+    auto_gui.moveTo((left, top), duration=0.2, tween=auto_gui.easeInOutQuad)
+    x = left + width*5/6
+    y = top + height*15/16
+    auto_gui.moveTo((x, y), duration=0.2, tween=auto_gui.easeInOutQuad)
+    auto_gui.click()
 
 
 def is_running(programme_name: str = '') -> bool:
@@ -80,27 +93,32 @@ def search_image_on_screen(img_path: os.path, confidence: float, grayscale: bool
 
     # search
     vector = 1  # to define searching for enlarged size or reduced size
-    for index in range(1, 9999):
+    tried = 0
+    while True:
         logging.info(f"Searching {os.path.basename(img_path)}, size: {searching_w}x{searching_h}")
+        print(f"Searching {os.path.basename(img_path)}, size: {image.size}")
         element = auto_gui.locateOnScreen(image, confidence=confidence, grayscale=grayscale)
         if element:
+            print(f"{image} found.")
             return element
 
         # searching for different sizes
-        searching_w = image_width * (1 + index*scale_factor) * vector
-        searching_h = image_height * (1 + index*scale_factor) * vector
+        tried += 1
+        searching_w = image_width * (1 + tried*scale_factor*vector)
+        searching_h = image_height * (1 + tried*scale_factor*vector)
 
         # if searching size is too large
         if vector == 1 and any([searching_w >= screen_width,
                                 searching_h >= screen_height,
                                 searching_w >= image_width * max_scale]):
             vector = -1  # search for reduced size
+            tried = 0
             # reset size
             searching_w = image_width
             searching_h = image_height
 
         # if search size is too small, end searching loop
-        elif searching_w <= image_width / max_scale:
+        elif searching_w < image_width / max_scale:
             return None
 
         # resize for the next loop
