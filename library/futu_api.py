@@ -181,7 +181,7 @@ class FutuApi:
         """
         Callback from trade_journal 'refresh' button
         """
-        if trade_journal.empty:
+        if not trade_journal.empty:
             trade_journal = self.filter_trade_journal(self.get_trade_journal(), start_date, end_date)
 
         return trade_journal
@@ -272,7 +272,9 @@ class FutuApi:
         algo_table = pd.DataFrame(columns=algo_table_cols)
 
         # get trade journal
-        trade_journal = self.filter_trade_journal(self.get_trade_journal(), start_date, end_date)
+        trade_journal = self.get_trade_journal()
+        if not trade_journal.empty:
+            trade_journal = self.filter_trade_journal(self.get_trade_journal(), start_date, end_date)
 
         # return dataframe with no trading record
         if trade_journal.empty:
@@ -354,6 +356,7 @@ class FutuApi:
         start = dt.datetime.strftime(start_date, '%Y-%m-%d') + ' 09:16:00'
         end = end_date + dt.timedelta(days=1)
         end = dt.datetime.strftime(end, '%Y-%m-%d') + ' 03:00:00'
+
         return df[(df['create_time'] >= start) & (df['create_time'] <= end)].reset_index(drop=True)
 
     def cal_algo_data(self, trade_journal: pd.DataFrame, strategy_name: str) -> (int, int, int, int, int):
