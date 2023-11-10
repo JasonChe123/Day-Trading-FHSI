@@ -104,7 +104,7 @@ class TradeJournal(Widget):
                 col_width = col_width_dict[col] if col_width_dict.get(col) else col_width_dict['others']
 
                 # set color
-                bg = (0, 0, 0,0 )
+                bg = (0, 0, 0, 0)
                 if col == 'trd_side':
                     bg = (0.2, 0.2, 0.5, 1.0) if value == 'BUY' else (0.5, 0.2, 0.2, 1.0)
 
