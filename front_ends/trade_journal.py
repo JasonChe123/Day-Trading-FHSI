@@ -8,6 +8,7 @@ os.environ['KIVY_LOG_MODE'] = 'MIXED'
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.label import Label
+from kivy.uix.spinner import Spinner
 from kivy.uix.widget import Widget
 from KivyCalendar import DatePicker
 
@@ -91,7 +92,7 @@ class TradeJournal(Widget):
             # add widget
             self.ids['data_table'].add_widget(
                 Button(text=header, size=(col_width, row_height), size_hint=(None, None),
-                       background_normal='', background_down='', background_color=(0.3, 0.3, 0.3, 1.0))
+                       background_normal='', background_down='', background_color=(0.7, 0.7, 0.7, 1))
             )
 
         # add rows
@@ -106,11 +107,11 @@ class TradeJournal(Widget):
                 # set color
                 bg = (0, 0, 0, 0)
                 if col == 'trd_side':
-                    bg = (0.2, 0.2, 0.5, 1.0) if value == 'BUY' else (0.5, 0.2, 0.2, 1.0)
+                    bg = (0.6, 0.8, 1.0, 1.0) if value == 'BUY' else (1.0, 0.8, 0.6, 1)
 
                 # check for new day
                 blank_row = False
-                fg = (1, 1, 1, 1)
+                fg = (0, 0, 0, 1)
                 if col == 'create_time':
                     # new day
                     if value[:value.index(' ')] != date:
@@ -118,7 +119,7 @@ class TradeJournal(Widget):
                         text = value[:value.index(' ')]
                         blank_row = True
                         date = text
-                        fg = (0.0, 1.0, 0.8, 1.0)
+                        fg = (0.2, 0.1, 0.3, 1.0)
                     # same day
                     else:
                         text = value[value.index(' ') + 1:]
@@ -136,7 +137,7 @@ class TradeJournal(Widget):
                 # add blank row for new day
                 if blank_row:
                     # add blank widget
-                    for i in range(trade_journal.shape[1] - 1):
+                    for j in range(trade_journal.shape[1] - 1):
                         self.ids['data_table'].add_widget(Widget())
 
                     # add time again

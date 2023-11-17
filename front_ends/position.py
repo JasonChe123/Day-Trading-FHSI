@@ -61,7 +61,7 @@ class Position(Widget):
             # add header
             button = Button(text=header.replace('_', ' ').title(), halign='left', valign='center',
                             size=(250, row_height), size_hint=(None, None),
-                            background_normal='', background_down='', background_color=(0.1, 0.1, 0.3, 1.0))
+                            background_normal='', background_down='', background_color=(0.7, 0.7, 0.7, 1.0))
             button.text_size = button.size
             self.ids['position_table'].add_widget(button)
 
@@ -72,7 +72,7 @@ class Position(Widget):
 
             # set color
             value = data.at[0, header]
-            color = (1.0, 1.0, 1.0, 1.0)
+            color = (0, 0, 0, 1)
             if isinstance(value, int | float):
                 if value < 0:
                     color = (1.0, 0.0, 0.0, 1.0)

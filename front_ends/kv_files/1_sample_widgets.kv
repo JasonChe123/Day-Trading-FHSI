@@ -1,5 +1,5 @@
 #:kivy 2.1.0
-#:set color_map {'bg': (0.3, 0.5, 0.7, 1.0)}
+#:set color_map {'bg': (1, 1, 1, 0.8)}
 
 
 # buttons ---------------------------------------------------------------------
@@ -7,14 +7,14 @@
     size: (100, 40)
     size_hint: (None, None)
     pos_hint: {'center_y': 0.5}
-    background_color: (0.4, 0.9, 0.2, 0.1)
+    background_color: (0, 0, 0, 0)
     canvas.before:
         Color:
-            rgba: (0.2, 0.9, 0.2, 0.5)
+            rgba: (0.2, 0.4, 0.2, 1)
         RoundedRectangle:
             size: self.size
             pos: self.pos
-            radius: [5]
+            radius: [10]
 
 <IconButton@Button>:
     border: (0, 0, 0, 0)
@@ -28,6 +28,9 @@
 
 
 # Label -----------------------------------------------------------------------
+<Label>:
+    color: 0, 0, 0, 1
+
 <PageButtonLabel@Label>:
     size: self.texture_size
     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
@@ -43,17 +46,30 @@
 # DatePicker ------------------------------------------------------------------
 <DatePicker>:
     pHint: 1.0, 0.5
+<ArrowButton>:
+    color: (1, 1, 1, 1)
+<MonthYearLabel>:
+    color: (1, 1, 1, 1)
+<DayAbbrLabel>:
+    color: (1, 1, 1, 1)
+<DayAbbrWeekendLabel>:
+    color: (1, 0.5, 0.5, 1)
+<DayButton>:
+    color: (1, 1, 1, 1)
+<DayNumWeekendButton>:
+    background_color: (1, 0.5, 0.5, 1)
 
 # Spinner ---------------------------------------------------------------------
 <MyOrderSpinnerOption@SpinnerOption>:
     size: 80, 30
     size_hint: None, None
-    background_color: (1, 0.3, 0.3, 1) if self.text == 'Sell' else (0.3, 1, 0.3, 1) if self.text == 'Buy' else (0.3, 0.3, 0.3, 1) if self.text == 'PlsSelect' else (0.3, 0.5, 0.5, 1)
+    background_color: (0.5, 0.2, 0.2, 1) if self.text == 'Sell' else (0.3, 1, 0.3, 1) if self.text == 'Buy' else (0.3, 0.3, 0.3, 1) if self.text == 'PlsSelect' else (0.3, 0.5, 0.5, 1)
+    color: (1, 1, 1, 1)
 
 <OrderSpinner>:
     text: 'PlsSelect'
     values: ('Buy', 'Sell', 'Cover')
     size: 80, 30
     size_hint: None, None
-    background_color: (1, 0.3, 0.3, 1) if self.text == 'Sell' else (0.3, 1, 0.3, 1) if self.text == 'Buy' else (0.3, 0.3, 0.3, 1) if self.text == 'PlsSelect' else (0.3, 0.5, 0.5, 1)
+    color: (1, 1, 1, 1)
     option_cls: 'MyOrderSpinnerOption'

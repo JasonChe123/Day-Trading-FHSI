@@ -4,9 +4,9 @@
         orientation: 'vertical'
         size: root.size
         padding: 10
+        spacing: 10
         canvas:
             Color:
-                # rgba: algo_trade_background
                 rgba: color_map.get('bg')
             Rectangle:
                 pos: self.pos
@@ -56,7 +56,7 @@
                     on_press: root.show_slide('algo_trade')
                 PageButtonLabel:
                     size_hint: (0.6, 0.3)
-                    text: 'Algo Trade'
+                    text: 'Trading'
 
             PageButton:
                 IconButton:
@@ -67,7 +67,7 @@
                     on_press: root.show_slide('trade_journal')
                 PageButtonLabel:
                     size_hint: (0.6, 0.3)
-                    text: 'Trade Journal'
+                    text: 'History'
 
             PageButton:
                 IconButton:
@@ -78,7 +78,7 @@
                     on_press: root.show_slide('account_info')
                 PageButtonLabel:
                     size_hint: (0.6, 0.3)
-                    text: 'Acc Info'
+                    text: 'Account'
 
             PageButton:
                 IconButton:
@@ -89,7 +89,7 @@
                     on_press: root.show_slide('position')
                 PageButtonLabel:
                     size_hint: (0.6, 0.3)
-                    text: 'Position'
+                    text: 'Inventory'
 
             PageButton:
                 IconButton:
@@ -125,24 +125,41 @@
             size_hint: 1.0, 0.05
             size: 0, 0
 
+            canvas:
+                Color:
+                    rgb: 0.8, 0.8, 0.4
+                Rectangle:
+                    pos: 0 + 10, self.y + self.height
+                    size: root.width - 20, 0.5
             Label:
                 text: 'Futu: '
-                size: self.texture_size
-                size_hint: None, None
+                size: 30, 0
+                size_hint: None, 1
             Label:
                 id: futu_conn
-                size: self.texture_size
-                size_hint: None, None
+                size: 80, 0
+                size_hint: None, 1
             Widget:
-                size: 40, 0
-                size_hint: None, None
-
+                size: 20, 0
+                size_hint: None, 1
             Label:
                 text: 'IB: '
-                size: self.texture_size
-                size_hint: None, None
+                size: 30, 0
+                size_hint: None, 1
             Label:
                 id: ib_conn
-                size: self.texture_size
-                size_hint: None, None
+                size: 80, 0
+                size_hint: None, 1
             Widget:
+            CheckBox:
+                id: checkbox_auto_shutdown
+                active: True
+                size: (40, 40)
+                size_hint: (None, None)
+                pos_hint: {'center_y': 0.5}
+                color: (0.2, 0.2, 0.2, 1)
+                on_press: root.update_auto_shutdown(self)
+            Label:
+                text: 'Auto Shutdown'
+                size: self.texture_size
+                size_hint: None, 1

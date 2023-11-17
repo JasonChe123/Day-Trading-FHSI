@@ -43,11 +43,11 @@ class AlgoTrade(Widget):
         super().__init__()
         self.main_app = App.get_running_app()
         self.color_map = {
-            'green': (0.3, 1.0, 0.3, 1.0),
-            'red': (0.7, 0.2, 0.2, 1.0),
-            'grey': (0.3, 0.3, 0.3, 1)
+            'green': (0.3, 0.5, 0.3, 1.0),
+            'red': (0.5, 0.2, 0.2, 1.0),
+            'grey': (0.7, 0.7, 0.7, 1)
         }
-        self.auto_shutdown = self.ids['checkbox_auto_shutdown'].active  # get checkbox by 'id' in kv file
+        # self.auto_shutdown = self.ids['checkbox_auto_shutdown'].active  # get checkbox by 'id' in kv file
         self.strategies = {}
         self.algo_table = pd.DataFrame()
         self.calendar = Calendar(self)
@@ -142,7 +142,7 @@ class AlgoTrade(Widget):
             strategy = self.strategies.get(row['Strategy'])
             for col in self.algo_table.columns:  # looping for column <----------
                 # reset params
-                label = Label(markup=True, font_size=18, text_size=(col_width, row_height),
+                label = Label(markup=True, font_size=16, text_size=(col_width, row_height),
                               size=(col_width, row_height), size_hint=(None, None), valign='middle')
                 value = row[col]
 
@@ -232,9 +232,6 @@ class AlgoTrade(Widget):
     def refresh(self, instance=None):
         self.update_table()
 
-    def update_auto_shutdown(self, instance=None):
-        logging.critical(f"update auto shutdown {instance.active}")
-
     def set_on_off_algo(self, instance=None):
         logging.critical("set on/off algo")
 
@@ -296,7 +293,7 @@ class AlgoTrade(Widget):
                     self.strategies[class_[1].name] = self.__getattribute__(class_[1].name.lower())
 
     def format_label(self, col, value):
-        color = (1, 1, 1)
+        color = (0, 0, 0, 1)
         halign = 'center'
         text = value
 

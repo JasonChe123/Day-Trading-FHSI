@@ -1,4 +1,5 @@
 import datetime as dt
+import logging
 import os
 
 os.environ['KIVY_LOG_MODE'] = 'MIXED'
@@ -54,3 +55,6 @@ class AlgoTradeMainPage(Widget):
     def update_clock(self):
         # get label by 'id' in kv file
         self.ids['label_time'].text = dt.datetime.strftime(dt.datetime.now(), '%d-%b-%Y ( %a )  %H:%M:%S')
+
+    def update_auto_shutdown(self, instance=None):
+        logging.critical(f"update auto shutdown {instance.active}")
